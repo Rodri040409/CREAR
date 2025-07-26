@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     siteName: siteConfig.title,
-    images: [`${siteConfig.url}/images/og.jpg`],
+    images: [`${siteConfig.url}/og/og.jpg`],
     type: 'website',
     locale: 'es_MX',
   },
