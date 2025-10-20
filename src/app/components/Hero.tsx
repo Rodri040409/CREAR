@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function SavoyeTopExact() {
   const ACCENT = "#c5a47e";
@@ -61,18 +62,44 @@ export default function SavoyeTopExact() {
       bg: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/3.jpg",
       title: "Urbanización",
       kicker: "Proyectos de",
-      copy: "Proyectos de urbanización, lotificación y levantamientos de topografía.",
+      copy:
+        "Proyectos de urbanización, lotificación y levantamientos de topografía.",
       cta: "#",
     },
   ];
 
+  // Rutas reales a /servicios/[slug]
   const services = [
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/6-2.png", label: "Diseño Arquitectónico", href: "#" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/2-2.png", label: "Construcción", href: "#" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/4-2.png", label: "Obra pública", href: "#" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/3-2.png", label: "Urbanización", href: "#" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/5-2.png", label: "Electrificación", href: "#" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/1-2.png", label: "Gestión de proyectos", href: "#" },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/6-2.png",
+      label: "Diseño Arquitectónico",
+      href: "/servicios/diseno-arquitectonico",
+    },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/2-2.png",
+      label: "Construcción",
+      href: "/servicios/construccion",
+    },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/4-2.png",
+      label: "Obra pública",
+      href: "/servicios/obra-publica",
+    },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/3-2.png",
+      label: "Urbanización",
+      href: "/servicios/urbanizacion",
+    },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/5-2.png",
+      label: "Electrificación",
+      href: "/servicios/electrificacion",
+    },
+    {
+      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/1-2.png",
+      label: "Gestión de proyectos",
+      href: "/servicios/gestion-de-proyectos",
+    },
   ];
 
   const [idx, setIdx] = useState(0);
@@ -121,7 +148,9 @@ export default function SavoyeTopExact() {
       {/* ======== HEADER SOLO CON LOGO (igual al original) ======== */}
       <motion.header
         initial={false}
-        animate={{ backgroundColor: navScroll ? NAV_SCROLL.headerBg : NAV_TOP.headerBg }}
+        animate={{
+          backgroundColor: navScroll ? NAV_SCROLL.headerBg : NAV_TOP.headerBg,
+        }}
         transition={{ duration: 0.2 }}
         className={`fixed top-0 left-0 right-0 z-[99] h-[10rem] flex items-center ${
           navScroll ? NAV_SCROLL.headerBorder : NAV_TOP.headerBorder
@@ -263,7 +292,7 @@ export default function SavoyeTopExact() {
             <div className="hidden md:block h-[17.6rem] bg-transparent" />
             <div className="hidden md:block h-[17.6rem] bg-transparent" />
 
-            <a
+            <Link
               href={services[0].href}
               title={services[0].label}
               className="group flex h-[14rem] md:h-[17.6rem] flex-col items-center justify-center gap-[1.6rem] bg-white transition-colors hover:bg-[#F3ECE5] md:border-r"
@@ -277,9 +306,9 @@ export default function SavoyeTopExact() {
               <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
                 {services[0].label}
               </span>
-            </a>
+            </Link>
 
-            <a
+            <Link
               href={services[1].href}
               title={services[1].label}
               className="group flex h-[14rem] md:h-[17.6rem] flex-col items-center justify-center gap-[1.6rem] bg-white transition-colors hover:bg-[#F3ECE5]"
@@ -292,13 +321,13 @@ export default function SavoyeTopExact() {
               <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
                 {services[1].label}
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Fila inferior */}
           <div className="grid grid-cols-1 md:grid-cols-4">
             {services.slice(2).map((svc, i, arr) => (
-              <a
+              <Link
                 key={svc.label}
                 href={svc.href}
                 title={svc.label}
@@ -317,7 +346,7 @@ export default function SavoyeTopExact() {
                 <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
                   {svc.label}
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>

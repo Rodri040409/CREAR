@@ -6,10 +6,9 @@ import Proyectos from './components/Proyectos';
 import News from './components/News';
 import Footer from './components/Footer';
 
-
 export default function HomePage() {
   return (
-    <main className='min-h-screen flex flex-col'>
+    <main className="min-h-screen flex flex-col">
       <Hero />
       <Nosotros />
       <Proyectos />
