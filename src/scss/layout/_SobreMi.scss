@@ -1,3 +1,301 @@
-@use 'base/variables' as v;
-@use 'base/mixins' as m;
+/* ===========================================================
+   SAVOYE – Home (React)  •  v2 closer to the WP original
+   Corrige: navbar transparente claro, hero alineado a la izq,
+   escalas de títulos, dots y botón, progreso to-top grande.
+   =========================================================== */
 
+/* ---- Tokens (mismos nombres para que puedas sustituir fácil) ---- */
+$font-sans: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+$font-serif: 'Roboto Slab', Georgia, serif;
+
+$white: #fff;
+$dark:  #111;   // theme base
+$body:  #555;   // body text
+$muted: #777;
+$line:  #e5e5e5;
+$accent: #c5a47e;     // dorado del tema
+$accent-weak: rgba(197,164,126,.25);
+$shadow: 0 10px 30px rgba(0,0,0,.08);
+$shadow-strong: 0 10px 40px rgba(0,0,0,.15);
+$maxw: 1140px;
+
+$bp-sm: 480px; $bp-md: 768px; $bp-lg: 1025px; $bp-xl: 1440px;
+
+@mixin container { width: min(92vw, #{$maxw}); margin-inline: auto; }
+@mixin abs-fill { position: absolute; inset: 0; }
+@mixin cover { background-size: cover; background-position: center; background-repeat: no-repeat; }
+@mixin uppercase($ls:.3em){ text-transform: uppercase; letter-spacing: $ls; }
+
+/* ---- Base ---- */
+*{ box-sizing: border-box; }
+html,body{ height:100%; scroll-behavior:smooth; }
+body{ margin:0; font-family:$font-sans; color:$body; background:$white; line-height:1.6; }
+img{ max-width:100%; height:auto; display:block; }
+.u-link{ color:inherit; text-decoration:none; }
+.u-title{ font-family:$font-serif; font-weight:900; line-height:1.05; }
+.u-title-shadow{ text-shadow:0 10px 30px rgba(0,0,0,.35); }
+.kicker{ @include uppercase(.34em); font-size:12px; color:$accent; }
+
+/* ===========================================================
+   PRELOADER (idéntico look white + spinner de aros)
+   =========================================================== */
+.preloader-bg{ @include abs-fill; position:fixed; background:$white; z-index:9997; }
+#preloader{ @include abs-fill; position:fixed; display:grid; place-items:center; z-index:9998; }
+#preloader-status .preloader-position.loader{
+  width:58px; height:58px; position:relative;
+  span,span:before,span:after{
+    content:""; @include abs-fill; border-radius:50%;
+    border:2px solid rgba(0,0,0,.12); border-top-color:$accent;
+    animation:savoye-spin .9s linear infinite;
+  }
+  span:before{ transform:scale(.72); border-top-color:rgba(0,0,0,.2); animation-duration:1.2s; }
+  span:after { transform:scale(.48); border-top-color:rgba(0,0,0,.3); animation-duration:1.6s; }
+}
+@keyframes savoye-spin{ to{ transform:rotate(360deg); } }
+
+/* ===========================================================
+   NAVBAR (importante: colores distintos en transparente vs sólido)
+   =========================================================== */
+.site-nav{
+  position:fixed; inset-block-start:0; inset-inline:0; z-index:102;
+  padding:28px 0; transition:background-color .35s ease, padding .35s ease, box-shadow .35s ease;
+
+  &__inner{ @include container; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+
+  .logo{ display:inline-flex; align-items:center; gap:10px; text-decoration:none;
+    &__box{ width:36px; height:36px; display:grid; place-items:center; border-radius:8px; }
+    &__text{ @include uppercase(.28em); font-weight:800; font-size:13px; }
+  }
+
+  .menu{ display:flex; gap:clamp(14px,2vw,28px); align-items:center; font-size:13px;
+    a{ @include uppercase(.28em); text-decoration:none; position:relative; padding-bottom:6px; }
+    a:after{ content:""; position:absolute; left:0; right:0; bottom:0; height:2px; transform:scaleX(0); transform-origin:left; background:$accent; transition:transform .25s ease; }
+    a:hover:after{ transform:scaleX(1); }
+  }
+
+  /* transparente = links blancos sobre hero */
+  &--transparent{
+    background:transparent; box-shadow:none;
+    .menu a{ color:$white; }
+    .logo__box{ background:$white; color:$dark; }
+    .logo__text{ color:$white; text-shadow:0 1px 10px rgba(0,0,0,.3); }
+  }
+
+  /* sólido = look “blanco” bootstrap del tema */
+  &--solid{
+    background:$white; box-shadow:$shadow; padding:16px 0;
+    .menu a{ color:$dark; }
+    .logo__box{ background:$dark; color:$white; }
+    .logo__text{ color:$dark; }
+  }
+
+  @media (max-width:$bp-md){ .menu{ display:none; } }
+}
+
+/* ===========================================================
+   HERO SLIDER (alineación izquierda como en el tema)
+   =========================================================== */
+.header.slider-fade{
+  position:relative; min-height:100vh; isolation:isolate; background:#000;
+
+  .slide{
+    @include abs-fill;
+
+    .bg{ @include abs-fill; @include cover; filter:brightness(.84) saturate(.92); }
+    .overlay{ @include abs-fill; background:linear-gradient(0deg, rgba(0,0,0,.58), rgba(0,0,0,.36)); mix-blend-mode:multiply; }
+
+    .caption{
+      @include abs-fill; display:grid; align-items:center; padding:clamp(20px,4vw,60px) 0;
+      &__inner{
+        @include container;
+        max-width: 1060px; /* ancho de columna central */
+        margin-left: 0;    /* alineado a la izq como en Savoye */
+        color:$white; text-align:left;
+        .kicker{ color:$accent; margin-bottom:10px; }
+        .u-title{ font-size:clamp(46px, 7.8vw, 86px); margin:4px 0 12px; }
+        p{ color:rgba(255,255,255,.88); max-width:660px; margin:0 0 22px; }
+        .btn{ display:inline-block; padding:15px 30px; border-radius:0; @include uppercase(.25em);
+          font-weight:800; font-size:12px; letter-spacing:.26em; }
+        .btn--light{ color:$dark; background:$white; border:1px solid rgba(255,255,255,.85); }
+        .btn--light:hover{ background:$accent; border-color:$accent; color:$white; }
+      }
+    }
+  }
+
+  /* dots más grandes con anillo claro (como owl del tema) */
+  .dots{
+    position:absolute; inset-inline:0; bottom:26px; display:flex; justify-content:center; gap:12px; z-index:2;
+    button{
+      width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.45); border:0; cursor:pointer;
+      &.is-active{ background:$white; box-shadow:0 0 0 5px rgba(255,255,255,.22); }
+    }
+  }
+}
+
+/* ===========================================================
+   RIBBON SERVICIOS (borde fino tipo grid del tema)
+   =========================================================== */
+.services-ribbon{
+  background:$white; position:relative; z-index:3;
+  &__shell{ @include container; }
+  &__box{
+    display:grid; grid-template-columns:repeat(6,1fr);
+    border:1px solid $line; border-left:0; border-top:0;
+    @media (max-width:$bp-lg){ grid-template-columns:repeat(3,1fr); }
+    @media (max-width:$bp-md){ grid-template-columns:repeat(2,1fr); }
+  }
+  .service{
+    display:grid; place-items:center; text-align:center; color:$dark; text-decoration:none; background:$white;
+    padding:30px 12px; border-left:1px solid $line; border-top:1px solid $line;
+    transition:background .25s ease, transform .25s ease;
+    &__icon{ width:44px; height:44px; object-fit:contain; margin-bottom:12px; }
+    &__title{ font-weight:700; font-size:14px; }
+    &:hover{ background:#fafafa; transform:translateY(-2px); }
+  }
+}
+
+/* ===========================================================
+   ABOUT
+   =========================================================== */
+.section{ padding:clamp(60px, 8.2vw, 110px) 0; }
+.section__inner{ @include container; }
+.section__title{ text-align:center; font-family:$font-serif; font-weight:900;
+  font-size:clamp(28px, 5vw, 44px); margin-bottom:32px; color:$dark; }
+
+.about{
+  &__grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(24px, 4vw, 60px);
+    @media (max-width:$bp-lg){ grid-template-columns:1fr; } }
+  &__title{ @include uppercase(.3em); font-weight:900; color:$dark; margin-bottom:8px; }
+  .divider{ width:56px; height:2px; background:$accent; margin:12px 0 18px; }
+  &__text p{ margin:0 0 14px; }
+}
+
+/* ===========================================================
+   PROJECTS (overlay/badge fuerte y media más oscura)
+   =========================================================== */
+.projects .projects__grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:30px;
+  @media (max-width:$bp-lg){ grid-template-columns:1fr; }
+}
+.project-card{
+  position:relative; display:block; color:$white; text-decoration:none; overflow:hidden; background:$dark;
+
+  &__media{ width:100%; height:100%; object-fit:cover; display:block;
+    filter:brightness(.88); transition:transform .6s cubic-bezier(.2,.7,.2,1); }
+  &:hover .project-card__media{ transform:scale(1.045); }
+
+  /* overlay degradado + badge */
+  &:before{ content:""; @include abs-fill; pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.52) 100%); }
+
+  &__badge{
+    position:absolute; left:0; bottom:0; width:64%; padding:18px 20px;
+    background:rgba(17,17,17,.88);
+    .cat{ @include uppercase(.28em); color:$accent; font-size:11px; margin-bottom:6px; }
+    .title{ font-family:$font-serif; font-weight:800; font-size:clamp(16px, 2.4vw, 22px); line-height:1.25; }
+    &--right{ left:auto; right:0; }
+  }
+
+  &--sq-tall{ aspect-ratio:3/4; }
+  &--wide{ aspect-ratio:16/9; }
+  &--rwide{ aspect-ratio:16/9; }
+  &--right-30{ aspect-ratio:4/3; .project-card__badge{ width:70%; } }
+  &--right-38{ aspect-ratio:4/3; .project-card__badge{ width:62%; } }
+}
+
+/* ===========================================================
+   PARALLAX DISCOVER + WASH
+   =========================================================== */
+.parallax-block{ position:relative; min-height:clamp(380px, 60vh, 560px); isolation:isolate; overflow:hidden;
+  &__bg{ @include abs-fill; @include cover; transform:translateZ(0); will-change:transform; }
+  &__bg.is-fixed{ background-attachment:fixed; }
+  &__overlay{ @include abs-fill; background:rgba(0,0,0,.25); mix-blend-mode:multiply; }
+  &__wash{ @include abs-fill; background:linear-gradient(0deg, rgba(255,255,255,.95), rgba(255,255,255,.95)); }
+}
+.discover{
+  position:relative; z-index:2; color:$white; text-align:left;
+  .inner{ @include container; padding:clamp(44px, 7.2vw, 100px) 0; }
+  .kicker{ color:$accent; }
+  .u-title{ font-size:clamp(36px, 7vw, 66px); margin:4px 0 8px; }
+  .meta{ font-weight:700; }
+}
+
+/* ===========================================================
+   BLOG
+   =========================================================== */
+.blog .blog__grid{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:30px;
+  @media (max-width:$bp-lg){ grid-template-columns:1fr 1fr; }
+  @media (max-width:$bp-md){ grid-template-columns:1fr; }
+}
+.post{
+  &__card{ display:block; text-decoration:none; color:inherit; }
+  &__media{ overflow:hidden; }
+  &__media img{ width:100%; height:auto; transform:scale(1.001); transition:transform .6s cubic-bezier(.2,.7,.2,1); }
+  &__card:hover .post__media img{ transform:scale(1.06); }
+  &__meta{ display:flex; align-items:center; gap:12px; color:$muted; font-size:13px; margin:14px 0 6px;
+    .tag{ @include uppercase(.28em); font-size:11px; color:$accent; } }
+  &__title{ font-family:$font-serif; font-weight:800; font-size:clamp(18px, 2.4vw, 22px); line-height:1.3; margin:0; }
+  &__title a{ color:$dark; text-decoration:none; }
+  &__title a:hover{ color:$accent; }
+}
+
+/* ===========================================================
+   CONTACT (parallax + CTA outline negro)
+   =========================================================== */
+.contact.parallax-block{
+  .inner{ @include container; padding:clamp(44px, 7vw, 90px) 0; color:$dark; position:relative; z-index:2; }
+  h3{ @include uppercase(.28em); font-weight:900; margin:0 0 22px; color:$dark; }
+  &__grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:30px;
+    @media (max-width:$bp-lg){ grid-template-columns:1fr; } }
+  .group-title{ @include uppercase(.28em); font-weight:800; color:$muted; margin-bottom:6px; }
+  .group-value{ font-family:$font-serif; font-weight:900; color:$dark; font-size:20px; margin-bottom:6px; }
+  .group-text{ color:$body; }
+  .cta{
+    display:inline-flex; align-items:center; gap:10px; @include uppercase(.3em);
+    font-weight:800; font-size:12px; padding:14px 18px; border:2px solid $dark; color:$dark; text-decoration:none;
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
+    &:hover{ background:$dark; color:$white; border-color:$dark; }
+  }
+}
+
+/* ===========================================================
+   FOOTER (dark)
+   =========================================================== */
+.main-footer{
+  background:$dark; color:rgba(255,255,255,.82); padding-top:80px;
+  .container{ @include container; }
+  .grid{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:30px; align-items:start;
+    @media (max-width:$bp-lg){ grid-template-columns:1fr; } }
+  .brand__title{ @include uppercase(.3em); font-weight:900; color:$white; margin-bottom:10px; }
+  .brand__text{ margin:0 0 16px; }
+  .brand__social{ display:flex; gap:12px;
+    a{ color:$white; text-decoration:none; opacity:.85; }
+    a:hover{ opacity:1; color:$accent; } }
+  .foot-col{
+    .col-title{ @include uppercase(.28em); font-weight:900; color:$white; margin-bottom:12px; }
+    ul{ list-style:none; padding:0; margin:0; }
+    li + li{ margin-top:8px; }
+    a{ color:rgba(255,255,255,.85); text-decoration:none; }
+    a:hover{ color:$accent; }
+  }
+  .sub-footer{
+    border-top:1px solid rgba(255,255,255,.08); margin-top:36px; padding:18px 0 28px;
+    display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    .legal{ font-size:14px; color:rgba(255,255,255,.72); }
+    .links{ display:flex; gap:16px;
+      a{ color:rgba(255,255,255,.82); text-decoration:none; } a:hover{ color:$accent; } }
+  }
+}
+
+/* ===========================================================
+   SCROLL-TO-TOP (tamaño y trazo como el original)
+   =========================================================== */
+.progress-wrap{
+  position:fixed; right:22px; bottom:22px; z-index:150; cursor:pointer;
+  width:56px; height:56px; border-radius:50%; background:$white; box-shadow:$shadow; display:grid; place-items:center;
+  svg{ width:42px; height:42px; transform:rotate(-90deg); }
+  .track, .bar{ fill:none; stroke-width:3px; }
+  .track{ stroke:rgba(0,0,0,.14); }
+  .bar{ stroke:$accent; transition:stroke-dashoffset .15s linear; }
+}
