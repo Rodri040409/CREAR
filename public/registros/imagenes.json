@@ -3,5 +3,10 @@
     "imagenes\\CREAR.png",
     "imagenes\\CREAR.webp",
     "imagenes\\CREAR.avif"
+  ],
+  "Hero\\Hero1.jpg": [
+    "imagenes\\Hero\\Hero1.jpg",
+    "imagenes\\Hero\\Hero1.webp",
+    "imagenes\\Hero\\Hero1.avif"
   ]
 }

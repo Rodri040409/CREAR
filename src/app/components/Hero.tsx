@@ -36,7 +36,7 @@ export default function SavoyeTopExact() {
 
   const slides = [
     {
-      bg: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/1.jpg",
+      bg: "/imagenes/Hero/Hero1.jpg",
       title: "CREAR",
       kicker: "Estudio de arquitectura",
       copy: "Construyendo con sentido.",
