@@ -1,11 +1,12 @@
 // server component
 import Link from "next/link";
 import Script from "next/script";
+
 import Footer from "@/app/components/Footer";
 
 const ACCENT = "#c5a47e";
 const LOGO_LIGHT =
-  "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/11/logo-light-2.png";
+  "/imagenes/CREAR.png";
 
 export default function DetailScaffold({
   hero,

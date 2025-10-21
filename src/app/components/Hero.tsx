@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 export default function SavoyeTopExact() {
   const ACCENT = "#c5a47e";
@@ -32,7 +32,7 @@ export default function SavoyeTopExact() {
   );
 
   const logoLight =
-    "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/11/logo-light-2.png";
+    "/imagenes/CREAR.png";
 
   const slides = [
     {

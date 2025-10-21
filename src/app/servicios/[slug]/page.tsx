@@ -1,17 +1,18 @@
 // src/app/servicios/[slug]/page.tsx
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Script from "next/script";
+
 import Footer from "@/app/components/Footer";
-import { SERVICES, SERVICE_DETAIL } from "@/app/lib/services";
+import { SERVICE_DETAIL,SERVICES } from "@/app/lib/services";
 
 type PageProps = { params: { slug: string } };
 
 // ---------------- Ajustes visuales ----------------
 const ACCENT = "#c5a47e";
 const LOGO_LIGHT =
-  "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/11/logo-light-2.png";
+  "/imagenes/CREAR.png";
 
 // Títulos en ES (si tu SERVICE_DETAIL está en inglés)
 const TITLE_ES: Record<string, string> = {
@@ -88,10 +89,10 @@ export default function ServiceDetailPage({ params }: PageProps) {
           <div className="mx-auto flex w-full max-w-[114rem] items-center justify-between px-[1.5rem] py-[1.2rem]">
             <Link
               href="/"
-              aria-label="Inicio — Savoye"
+              aria-label="Inicio — CREAR"
               className="relative inline-flex items-center rounded bg-white px-6 py-4 shadow-[0_1rem_2.6rem_rgba(0,0,0,.14)]"
             >
-              <img src={LOGO_LIGHT} alt="Savoye" className="h-[2.8rem]" />
+              <img src={LOGO_LIGHT} alt="CREAR" className="h-[2.8rem]" />
             </Link>
 
             <Link
@@ -148,7 +149,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
                   key={src}
                   href={src}
                   data-fancybox="gallery"
-                  data-caption="Savoye Architecture"
+                  data-caption="CREAR Architecture"
                   className="group relative block h-[28rem] w-full overflow-hidden"
                 >
                   <img
@@ -163,7 +164,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
                 <a
                   href={detail.gallery[2]}
                   data-fancybox="gallery"
-                  data-caption="Savoye Architecture"
+                  data-caption="CREAR Architecture"
                   className="group relative col-span-1 h-[38rem] w-full overflow-hidden md:col-span-2"
                 >
                   <img
