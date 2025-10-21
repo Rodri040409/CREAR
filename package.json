@@ -19,6 +19,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@react-spring/web": "^10.0.3",
     "clsx": "^2.0.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.438.0",
