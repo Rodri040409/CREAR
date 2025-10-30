@@ -1,12 +1,532 @@
 {
   "CREAR.png": [
-    "imagenes\\CREAR.png",
-    "imagenes\\CREAR.webp",
-    "imagenes\\CREAR.avif"
+    "imagenes/CREAR.png",
+    "imagenes/CREAR.webp",
+    "imagenes/CREAR.avif"
   ],
-  "Hero\\Hero1.jpg": [
-    "imagenes\\Hero\\Hero1.jpg",
-    "imagenes\\Hero\\Hero1.webp",
-    "imagenes\\Hero\\Hero1.avif"
+  "Sections/Public-Obra/11.jpeg": [
+    "imagenes/Sections/Public-Obra/11.jpg",
+    "imagenes/Sections/Public-Obra/11.webp",
+    "imagenes/Sections/Public-Obra/11.avif"
+  ],
+  "Sections/Public-Obra/3.jpeg": [
+    "imagenes/Sections/Public-Obra/3.jpg",
+    "imagenes/Sections/Public-Obra/3.webp",
+    "imagenes/Sections/Public-Obra/3.avif"
+  ],
+  "Sections/Public-Obra/9.jpeg": [
+    "imagenes/Sections/Public-Obra/9.jpg",
+    "imagenes/Sections/Public-Obra/9.webp",
+    "imagenes/Sections/Public-Obra/9.avif"
+  ],
+  "Sections/Public-Obra/10.jpeg": [
+    "imagenes/Sections/Public-Obra/10.jpg",
+    "imagenes/Sections/Public-Obra/10.webp",
+    "imagenes/Sections/Public-Obra/10.avif"
+  ],
+  "Sections/Public-Obra/5.jpeg": [
+    "imagenes/Sections/Public-Obra/5.jpg",
+    "imagenes/Sections/Public-Obra/5.webp",
+    "imagenes/Sections/Public-Obra/5.avif"
+  ],
+  "Sections/Public-Obra/1.jpeg": [
+    "imagenes/Sections/Public-Obra/1.jpg",
+    "imagenes/Sections/Public-Obra/1.webp",
+    "imagenes/Sections/Public-Obra/1.avif"
+  ],
+  "Sections/Public-Obra/2.jpeg": [
+    "imagenes/Sections/Public-Obra/2.jpg",
+    "imagenes/Sections/Public-Obra/2.webp",
+    "imagenes/Sections/Public-Obra/2.avif"
+  ],
+  "Sections/Public-Obra/8.jpeg": [
+    "imagenes/Sections/Public-Obra/8.jpg",
+    "imagenes/Sections/Public-Obra/8.webp",
+    "imagenes/Sections/Public-Obra/8.avif"
+  ],
+  "Sections/Public-Obra/7.jpeg": [
+    "imagenes/Sections/Public-Obra/7.jpg",
+    "imagenes/Sections/Public-Obra/7.webp",
+    "imagenes/Sections/Public-Obra/7.avif"
+  ],
+  "Sections/Public-Obra/6.jpeg": [
+    "imagenes/Sections/Public-Obra/6.jpg",
+    "imagenes/Sections/Public-Obra/6.webp",
+    "imagenes/Sections/Public-Obra/6.avif"
+  ],
+  "Sections/Public-Obra/4.jpeg": [
+    "imagenes/Sections/Public-Obra/4.jpg",
+    "imagenes/Sections/Public-Obra/4.webp",
+    "imagenes/Sections/Public-Obra/4.avif"
+  ],
+  "Sections/Construction/3.jpeg": [
+    "imagenes/Sections/Construction/3.jpg",
+    "imagenes/Sections/Construction/3.webp",
+    "imagenes/Sections/Construction/3.avif"
+  ],
+  "Sections/Construction/9.jpeg": [
+    "imagenes/Sections/Construction/9.jpg",
+    "imagenes/Sections/Construction/9.webp",
+    "imagenes/Sections/Construction/9.avif"
+  ],
+  "Sections/Construction/10.jpeg": [
+    "imagenes/Sections/Construction/10.jpg",
+    "imagenes/Sections/Construction/10.webp",
+    "imagenes/Sections/Construction/10.avif"
+  ],
+  "Sections/Construction/5.jpeg": [
+    "imagenes/Sections/Construction/5.jpg",
+    "imagenes/Sections/Construction/5.webp",
+    "imagenes/Sections/Construction/5.avif"
+  ],
+  "Sections/Construction/1.jpeg": [
+    "imagenes/Sections/Construction/1.jpg",
+    "imagenes/Sections/Construction/1.webp",
+    "imagenes/Sections/Construction/1.avif"
+  ],
+  "Sections/Construction/2.jpeg": [
+    "imagenes/Sections/Construction/2.jpg",
+    "imagenes/Sections/Construction/2.webp",
+    "imagenes/Sections/Construction/2.avif"
+  ],
+  "Sections/Construction/8.jpeg": [
+    "imagenes/Sections/Construction/8.jpg",
+    "imagenes/Sections/Construction/8.webp",
+    "imagenes/Sections/Construction/8.avif"
+  ],
+  "Sections/Construction/7.jpeg": [
+    "imagenes/Sections/Construction/7.jpg",
+    "imagenes/Sections/Construction/7.webp",
+    "imagenes/Sections/Construction/7.avif"
+  ],
+  "Sections/Construction/6.jpeg": [
+    "imagenes/Sections/Construction/6.jpg",
+    "imagenes/Sections/Construction/6.webp",
+    "imagenes/Sections/Construction/6.avif"
+  ],
+  "Sections/Construction/4.jpeg": [
+    "imagenes/Sections/Construction/4.jpg",
+    "imagenes/Sections/Construction/4.webp",
+    "imagenes/Sections/Construction/4.avif"
+  ],
+  "Sections/Gestion/3.jpeg": [
+    "imagenes/Sections/Gestion/3.jpg",
+    "imagenes/Sections/Gestion/3.webp",
+    "imagenes/Sections/Gestion/3.avif"
+  ],
+  "Sections/Gestion/5.jpeg": [
+    "imagenes/Sections/Gestion/5.jpg",
+    "imagenes/Sections/Gestion/5.webp",
+    "imagenes/Sections/Gestion/5.avif"
+  ],
+  "Sections/Gestion/1.jpeg": [
+    "imagenes/Sections/Gestion/1.jpg",
+    "imagenes/Sections/Gestion/1.webp",
+    "imagenes/Sections/Gestion/1.avif"
+  ],
+  "Sections/Gestion/2.jpeg": [
+    "imagenes/Sections/Gestion/2.jpg",
+    "imagenes/Sections/Gestion/2.webp",
+    "imagenes/Sections/Gestion/2.avif"
+  ],
+  "Sections/Gestion/4.jpeg": [
+    "imagenes/Sections/Gestion/4.jpg",
+    "imagenes/Sections/Gestion/4.webp",
+    "imagenes/Sections/Gestion/4.avif"
+  ],
+  "Sections/Urbanitation/11.jpeg": [
+    "imagenes/Sections/Urbanitation/11.jpg",
+    "imagenes/Sections/Urbanitation/11.webp",
+    "imagenes/Sections/Urbanitation/11.avif"
+  ],
+  "Sections/Urbanitation/18.jpeg": [
+    "imagenes/Sections/Urbanitation/18.jpg",
+    "imagenes/Sections/Urbanitation/18.webp",
+    "imagenes/Sections/Urbanitation/18.avif"
+  ],
+  "Sections/Urbanitation/3.jpeg": [
+    "imagenes/Sections/Urbanitation/3.jpg",
+    "imagenes/Sections/Urbanitation/3.webp",
+    "imagenes/Sections/Urbanitation/3.avif"
+  ],
+  "Sections/Urbanitation/9.jpeg": [
+    "imagenes/Sections/Urbanitation/9.jpg",
+    "imagenes/Sections/Urbanitation/9.webp",
+    "imagenes/Sections/Urbanitation/9.avif"
+  ],
+  "Sections/Urbanitation/15.jpeg": [
+    "imagenes/Sections/Urbanitation/15.jpg",
+    "imagenes/Sections/Urbanitation/15.webp",
+    "imagenes/Sections/Urbanitation/15.avif"
+  ],
+  "Sections/Urbanitation/10.jpeg": [
+    "imagenes/Sections/Urbanitation/10.jpg",
+    "imagenes/Sections/Urbanitation/10.webp",
+    "imagenes/Sections/Urbanitation/10.avif"
+  ],
+  "Sections/Urbanitation/14.jpeg": [
+    "imagenes/Sections/Urbanitation/14.jpg",
+    "imagenes/Sections/Urbanitation/14.webp",
+    "imagenes/Sections/Urbanitation/14.avif"
+  ],
+  "Sections/Urbanitation/5.jpeg": [
+    "imagenes/Sections/Urbanitation/5.jpg",
+    "imagenes/Sections/Urbanitation/5.webp",
+    "imagenes/Sections/Urbanitation/5.avif"
+  ],
+  "Sections/Urbanitation/19.jpeg": [
+    "imagenes/Sections/Urbanitation/19.jpg",
+    "imagenes/Sections/Urbanitation/19.webp",
+    "imagenes/Sections/Urbanitation/19.avif"
+  ],
+  "Sections/Urbanitation/16.jpeg": [
+    "imagenes/Sections/Urbanitation/16.jpg",
+    "imagenes/Sections/Urbanitation/16.webp",
+    "imagenes/Sections/Urbanitation/16.avif"
+  ],
+  "Sections/Urbanitation/20.jpeg": [
+    "imagenes/Sections/Urbanitation/20.jpg",
+    "imagenes/Sections/Urbanitation/20.webp",
+    "imagenes/Sections/Urbanitation/20.avif"
+  ],
+  "Sections/Urbanitation/1.jpeg": [
+    "imagenes/Sections/Urbanitation/1.jpg",
+    "imagenes/Sections/Urbanitation/1.webp",
+    "imagenes/Sections/Urbanitation/1.avif"
+  ],
+  "Sections/Urbanitation/2.jpeg": [
+    "imagenes/Sections/Urbanitation/2.jpg",
+    "imagenes/Sections/Urbanitation/2.webp",
+    "imagenes/Sections/Urbanitation/2.avif"
+  ],
+  "Sections/Urbanitation/8.jpeg": [
+    "imagenes/Sections/Urbanitation/8.jpg",
+    "imagenes/Sections/Urbanitation/8.webp",
+    "imagenes/Sections/Urbanitation/8.avif"
+  ],
+  "Sections/Urbanitation/7.jpeg": [
+    "imagenes/Sections/Urbanitation/7.jpg",
+    "imagenes/Sections/Urbanitation/7.webp",
+    "imagenes/Sections/Urbanitation/7.avif"
+  ],
+  "Sections/Urbanitation/6.jpeg": [
+    "imagenes/Sections/Urbanitation/6.jpg",
+    "imagenes/Sections/Urbanitation/6.webp",
+    "imagenes/Sections/Urbanitation/6.avif"
+  ],
+  "Sections/Urbanitation/13.jpeg": [
+    "imagenes/Sections/Urbanitation/13.jpg",
+    "imagenes/Sections/Urbanitation/13.webp",
+    "imagenes/Sections/Urbanitation/13.avif"
+  ],
+  "Sections/Urbanitation/12.jpeg": [
+    "imagenes/Sections/Urbanitation/12.jpg",
+    "imagenes/Sections/Urbanitation/12.webp",
+    "imagenes/Sections/Urbanitation/12.avif"
+  ],
+  "Sections/Urbanitation/4.jpeg": [
+    "imagenes/Sections/Urbanitation/4.jpg",
+    "imagenes/Sections/Urbanitation/4.webp",
+    "imagenes/Sections/Urbanitation/4.avif"
+  ],
+  "Sections/Urbanitation/17.jpeg": [
+    "imagenes/Sections/Urbanitation/17.jpg",
+    "imagenes/Sections/Urbanitation/17.webp",
+    "imagenes/Sections/Urbanitation/17.avif"
+  ],
+  "Sections/Electrification/3.jpeg": [
+    "imagenes/Sections/Electrification/3.jpg",
+    "imagenes/Sections/Electrification/3.webp",
+    "imagenes/Sections/Electrification/3.avif"
+  ],
+  "Sections/Electrification/9.jpeg": [
+    "imagenes/Sections/Electrification/9.jpg",
+    "imagenes/Sections/Electrification/9.webp",
+    "imagenes/Sections/Electrification/9.avif"
+  ],
+  "Sections/Electrification/10.jpeg": [
+    "imagenes/Sections/Electrification/10.jpg",
+    "imagenes/Sections/Electrification/10.webp",
+    "imagenes/Sections/Electrification/10.avif"
+  ],
+  "Sections/Electrification/5.jpeg": [
+    "imagenes/Sections/Electrification/5.jpg",
+    "imagenes/Sections/Electrification/5.webp",
+    "imagenes/Sections/Electrification/5.avif"
+  ],
+  "Sections/Electrification/1.jpeg": [
+    "imagenes/Sections/Electrification/1.jpg",
+    "imagenes/Sections/Electrification/1.webp",
+    "imagenes/Sections/Electrification/1.avif"
+  ],
+  "Sections/Electrification/2.jpeg": [
+    "imagenes/Sections/Electrification/2.jpg",
+    "imagenes/Sections/Electrification/2.webp",
+    "imagenes/Sections/Electrification/2.avif"
+  ],
+  "Sections/Electrification/8.jpeg": [
+    "imagenes/Sections/Electrification/8.jpg",
+    "imagenes/Sections/Electrification/8.webp",
+    "imagenes/Sections/Electrification/8.avif"
+  ],
+  "Sections/Electrification/7.jpeg": [
+    "imagenes/Sections/Electrification/7.jpg",
+    "imagenes/Sections/Electrification/7.webp",
+    "imagenes/Sections/Electrification/7.avif"
+  ],
+  "Sections/Electrification/6.jpeg": [
+    "imagenes/Sections/Electrification/6.jpg",
+    "imagenes/Sections/Electrification/6.webp",
+    "imagenes/Sections/Electrification/6.avif"
+  ],
+  "Sections/Electrification/4.jpeg": [
+    "imagenes/Sections/Electrification/4.jpg",
+    "imagenes/Sections/Electrification/4.webp",
+    "imagenes/Sections/Electrification/4.avif"
+  ],
+  "Sections/Disign-Arq/3.jpeg": [
+    "imagenes/Sections/Disign-Arq/3.jpg",
+    "imagenes/Sections/Disign-Arq/3.webp",
+    "imagenes/Sections/Disign-Arq/3.avif"
+  ],
+  "Sections/Disign-Arq/9.jpeg": [
+    "imagenes/Sections/Disign-Arq/9.jpg",
+    "imagenes/Sections/Disign-Arq/9.webp",
+    "imagenes/Sections/Disign-Arq/9.avif"
+  ],
+  "Sections/Disign-Arq/10.jpeg": [
+    "imagenes/Sections/Disign-Arq/10.jpg",
+    "imagenes/Sections/Disign-Arq/10.webp",
+    "imagenes/Sections/Disign-Arq/10.avif"
+  ],
+  "Sections/Disign-Arq/5.jpeg": [
+    "imagenes/Sections/Disign-Arq/5.jpg",
+    "imagenes/Sections/Disign-Arq/5.webp",
+    "imagenes/Sections/Disign-Arq/5.avif"
+  ],
+  "Sections/Disign-Arq/1.jpeg": [
+    "imagenes/Sections/Disign-Arq/1.jpg",
+    "imagenes/Sections/Disign-Arq/1.webp",
+    "imagenes/Sections/Disign-Arq/1.avif"
+  ],
+  "Sections/Disign-Arq/2.jpeg": [
+    "imagenes/Sections/Disign-Arq/2.jpg",
+    "imagenes/Sections/Disign-Arq/2.webp",
+    "imagenes/Sections/Disign-Arq/2.avif"
+  ],
+  "Sections/Disign-Arq/8.jpeg": [
+    "imagenes/Sections/Disign-Arq/8.jpg",
+    "imagenes/Sections/Disign-Arq/8.webp",
+    "imagenes/Sections/Disign-Arq/8.avif"
+  ],
+  "Sections/Disign-Arq/7.jpeg": [
+    "imagenes/Sections/Disign-Arq/7.jpg",
+    "imagenes/Sections/Disign-Arq/7.webp",
+    "imagenes/Sections/Disign-Arq/7.avif"
+  ],
+  "Sections/Disign-Arq/6.jpeg": [
+    "imagenes/Sections/Disign-Arq/6.jpg",
+    "imagenes/Sections/Disign-Arq/6.webp",
+    "imagenes/Sections/Disign-Arq/6.avif"
+  ],
+  "Sections/Disign-Arq/4.jpeg": [
+    "imagenes/Sections/Disign-Arq/4.jpg",
+    "imagenes/Sections/Disign-Arq/4.webp",
+    "imagenes/Sections/Disign-Arq/4.avif"
+  ],
+  "Proyectos/PiscinaBoca/3.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/3.jpg",
+    "imagenes/Proyectos/PiscinaBoca/3.webp",
+    "imagenes/Proyectos/PiscinaBoca/3.avif"
+  ],
+  "Proyectos/PiscinaBoca/5.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/5.jpg",
+    "imagenes/Proyectos/PiscinaBoca/5.webp",
+    "imagenes/Proyectos/PiscinaBoca/5.avif"
+  ],
+  "Proyectos/PiscinaBoca/1.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/1.jpg",
+    "imagenes/Proyectos/PiscinaBoca/1.webp",
+    "imagenes/Proyectos/PiscinaBoca/1.avif"
+  ],
+  "Proyectos/PiscinaBoca/2.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/2.jpg",
+    "imagenes/Proyectos/PiscinaBoca/2.webp",
+    "imagenes/Proyectos/PiscinaBoca/2.avif"
+  ],
+  "Proyectos/PiscinaBoca/7.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/7.jpg",
+    "imagenes/Proyectos/PiscinaBoca/7.webp",
+    "imagenes/Proyectos/PiscinaBoca/7.avif"
+  ],
+  "Proyectos/PiscinaBoca/6.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/6.jpg",
+    "imagenes/Proyectos/PiscinaBoca/6.webp",
+    "imagenes/Proyectos/PiscinaBoca/6.avif"
+  ],
+  "Proyectos/PiscinaBoca/4.jpeg": [
+    "imagenes/Proyectos/PiscinaBoca/4.jpg",
+    "imagenes/Proyectos/PiscinaBoca/4.webp",
+    "imagenes/Proyectos/PiscinaBoca/4.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/3.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/3.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/3.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/3.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/5.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/5.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/5.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/5.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/1.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/1.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/1.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/1.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/2.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/2.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/2.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/2.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/8.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/8.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/8.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/8.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/7.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/7.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/7.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/7.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/6.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/6.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/6.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/6.avif"
+  ],
+  "Proyectos/PiscinaCoapexpan/4.jpeg": [
+    "imagenes/Proyectos/PiscinaCoapexpan/4.jpg",
+    "imagenes/Proyectos/PiscinaCoapexpan/4.webp",
+    "imagenes/Proyectos/PiscinaCoapexpan/4.avif"
+  ],
+  "Proyectos/CasaBriones01/11.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/11.jpg",
+    "imagenes/Proyectos/CasaBriones01/11.webp",
+    "imagenes/Proyectos/CasaBriones01/11.avif"
+  ],
+  "Proyectos/CasaBriones01/3.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/3.jpg",
+    "imagenes/Proyectos/CasaBriones01/3.webp",
+    "imagenes/Proyectos/CasaBriones01/3.avif"
+  ],
+  "Proyectos/CasaBriones01/9.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/9.jpg",
+    "imagenes/Proyectos/CasaBriones01/9.webp",
+    "imagenes/Proyectos/CasaBriones01/9.avif"
+  ],
+  "Proyectos/CasaBriones01/10.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/10.jpg",
+    "imagenes/Proyectos/CasaBriones01/10.webp",
+    "imagenes/Proyectos/CasaBriones01/10.avif"
+  ],
+  "Proyectos/CasaBriones01/5.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/5.jpg",
+    "imagenes/Proyectos/CasaBriones01/5.webp",
+    "imagenes/Proyectos/CasaBriones01/5.avif"
+  ],
+  "Proyectos/CasaBriones01/1.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/1.jpg",
+    "imagenes/Proyectos/CasaBriones01/1.webp",
+    "imagenes/Proyectos/CasaBriones01/1.avif"
+  ],
+  "Proyectos/CasaBriones01/2.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/2.jpg",
+    "imagenes/Proyectos/CasaBriones01/2.webp",
+    "imagenes/Proyectos/CasaBriones01/2.avif"
+  ],
+  "Proyectos/CasaBriones01/8.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/8.jpg",
+    "imagenes/Proyectos/CasaBriones01/8.webp",
+    "imagenes/Proyectos/CasaBriones01/8.avif"
+  ],
+  "Proyectos/CasaBriones01/7.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/7.jpg",
+    "imagenes/Proyectos/CasaBriones01/7.webp",
+    "imagenes/Proyectos/CasaBriones01/7.avif"
+  ],
+  "Proyectos/CasaBriones01/6.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/6.jpg",
+    "imagenes/Proyectos/CasaBriones01/6.webp",
+    "imagenes/Proyectos/CasaBriones01/6.avif"
+  ],
+  "Proyectos/CasaBriones01/12.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/12.jpg",
+    "imagenes/Proyectos/CasaBriones01/12.webp",
+    "imagenes/Proyectos/CasaBriones01/12.avif"
+  ],
+  "Proyectos/CasaBriones01/4.jpeg": [
+    "imagenes/Proyectos/CasaBriones01/4.jpg",
+    "imagenes/Proyectos/CasaBriones01/4.webp",
+    "imagenes/Proyectos/CasaBriones01/4.avif"
+  ],
+  "Proyectos/Casa21/11.jpeg": [
+    "imagenes/Proyectos/Casa21/11.jpg",
+    "imagenes/Proyectos/Casa21/11.webp",
+    "imagenes/Proyectos/Casa21/11.avif"
+  ],
+  "Proyectos/Casa21/3.jpeg": [
+    "imagenes/Proyectos/Casa21/3.jpg",
+    "imagenes/Proyectos/Casa21/3.webp",
+    "imagenes/Proyectos/Casa21/3.avif"
+  ],
+  "Proyectos/Casa21/9.jpeg": [
+    "imagenes/Proyectos/Casa21/9.jpg",
+    "imagenes/Proyectos/Casa21/9.webp",
+    "imagenes/Proyectos/Casa21/9.avif"
+  ],
+  "Proyectos/Casa21/10.jpeg": [
+    "imagenes/Proyectos/Casa21/10.jpg",
+    "imagenes/Proyectos/Casa21/10.webp",
+    "imagenes/Proyectos/Casa21/10.avif"
+  ],
+  "Proyectos/Casa21/5.jpeg": [
+    "imagenes/Proyectos/Casa21/5.jpg",
+    "imagenes/Proyectos/Casa21/5.webp",
+    "imagenes/Proyectos/Casa21/5.avif"
+  ],
+  "Proyectos/Casa21/1.jpeg": [
+    "imagenes/Proyectos/Casa21/1.jpg",
+    "imagenes/Proyectos/Casa21/1.webp",
+    "imagenes/Proyectos/Casa21/1.avif"
+  ],
+  "Proyectos/Casa21/2.jpeg": [
+    "imagenes/Proyectos/Casa21/2.jpg",
+    "imagenes/Proyectos/Casa21/2.webp",
+    "imagenes/Proyectos/Casa21/2.avif"
+  ],
+  "Proyectos/Casa21/8.jpeg": [
+    "imagenes/Proyectos/Casa21/8.jpg",
+    "imagenes/Proyectos/Casa21/8.webp",
+    "imagenes/Proyectos/Casa21/8.avif"
+  ],
+  "Proyectos/Casa21/7.jpeg": [
+    "imagenes/Proyectos/Casa21/7.jpg",
+    "imagenes/Proyectos/Casa21/7.webp",
+    "imagenes/Proyectos/Casa21/7.avif"
+  ],
+  "Proyectos/Casa21/6.jpeg": [
+    "imagenes/Proyectos/Casa21/6.jpg",
+    "imagenes/Proyectos/Casa21/6.webp",
+    "imagenes/Proyectos/Casa21/6.avif"
+  ],
+  "Proyectos/Casa21/4.jpeg": [
+    "imagenes/Proyectos/Casa21/4.jpg",
+    "imagenes/Proyectos/Casa21/4.webp",
+    "imagenes/Proyectos/Casa21/4.avif"
+  ],
+  "Hero/Hero1.jpg": [
+    "imagenes/Hero/Hero1.jpg",
+    "imagenes/Hero/Hero1.webp",
+    "imagenes/Hero/Hero1.avif"
   ]
 }

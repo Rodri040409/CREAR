@@ -68,9 +68,9 @@ export const SERVICE_DETAIL: Record<string, ServiceDetail> = {
       "Trabajamos con procesos claros y colaborativos (modelado digital y revisiones guiadas) para que puedas visualizar tu proyecto desde el concepto hasta el detalle constructivo.",
     ],
     gallery: [
-      "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/2.jpg",
-      "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/3.jpg",
-      "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/1.jpg",
+      "/imagenes/Sections/Disign-Arq/1.webp",
+      "/imagenes/Sections/Disign-Arq/3.webp",
+      "/imagenes/Sections/Disign-Arq/2.webp",
     ],
     contactBg:
       "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/2.jpg",

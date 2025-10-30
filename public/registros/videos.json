@@ -1,10 +1,10 @@
 {
-  "concierto.mp4": {
+  "NewsVideo.mp4": {
     "formatos": [
-      "videos\\concierto.mp4",
-      "videos\\concierto.webm",
-      "videos\\concierto.ogg"
+      "videos/NewsVideo.mp4",
+      "videos/NewsVideo.webm",
+      "videos/NewsVideo.ogg"
     ],
-    "gif": "gif\\concierto.gif"
+    "gif": "gif/NewsVideo.gif"
   }
 }
