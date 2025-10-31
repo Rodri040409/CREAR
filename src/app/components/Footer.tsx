@@ -19,7 +19,7 @@ export default function SavoyeContactFooterExact() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url(https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/2.jpg)",
+              "url(/imagenes/Hero/Hero1.jpg)",
             backgroundAttachment: "fixed", // .bg-fixed
           }}
           aria-hidden={true}

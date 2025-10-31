@@ -144,36 +144,31 @@ export default function ServiceDetailPage({ params }: PageProps) {
 
             {/* Galería (2 arriba + 1 grande abajo) con hover y Fancybox */}
             <div className="mt-[2.4rem] grid grid-cols-1 gap-[1.6rem] md:grid-cols-2">
-              {detail.gallery.slice(0, 2).map((src) => (
-                <a
-                  key={src}
-                  href={src}
-                  data-fancybox="gallery"
-                  data-caption="CREAR Architecture"
-                  className="group relative block h-[28rem] w-full overflow-hidden"
-                >
-                  <img
-                    src={src}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] group-hover:shadow-xl"
-                  />
-                </a>
-              ))}
 
-              {detail.gallery[2] && (
-                <a
-                  href={detail.gallery[2]}
-                  data-fancybox="gallery"
-                  data-caption="CREAR Architecture"
-                  className="group relative col-span-1 h-[38rem] w-full overflow-hidden md:col-span-2"
-                >
-                  <img
-                    src={detail.gallery[2]}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] group-hover:shadow-xl"
-                  />
-                </a>
-              )}
+              {detail.gallery.map((src, i, arr) => {
+                  // Es el último elemento de la galería
+                  const isLast = i === arr.length - 1;
+
+                  return (
+                    <a
+                      key={src}
+                      href={src}
+                      data-fancybox="gallery"
+                      data-caption="CREAR IMAGEN"
+                      className={`group relative block w-full overflow-hidden transition-all duration-300 ${
+                        isLast
+                          ? "h-[38rem] md:col-span-2" // Última: más alta y de 2 columnas
+                          : "h-[28rem] col-span-1" // Demás: altura estándar y 1 columna
+                      }`}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] group-hover:shadow-xl"
+                      />
+                    </a>
+                  );
+                })}
             </div>
           </div>
 

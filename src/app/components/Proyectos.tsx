@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { PROJECTS, type ProjectItem } from "@/app/lib/projects";
+import Link from "next/link";
+
+import { type ProjectItem,PROJECTS } from "@/app/lib/projects";
 
 const ACCENT = "#c5a47e";
 
@@ -21,7 +22,7 @@ export default function Proyectos() {
       <div className="mx-auto w-full max-w-[114rem] px-[1.5rem] py-[10rem] md:py-[12rem]">
         <div className="text-center">
           <h2 className="[font-family:'Khand',_sans-serif] uppercase text-[#272727] font-[500] leading-[1] tracking-[0.05rem] text-[4.2rem] sm:text-[5rem] md:text-[6rem] mb-[2rem] md:mb-[2.5rem]">
-            Nuestros proyectos
+            Proyectos en proceso
           </h2>
         </div>
 
