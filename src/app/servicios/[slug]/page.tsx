@@ -5,14 +5,13 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 
 import Footer from "@/app/components/Footer";
-import { SERVICE_DETAIL,SERVICES } from "@/app/lib/services";
+import { SERVICE_DETAIL, SERVICES } from "@/app/lib/services";
 
 type PageProps = { params: { slug: string } };
 
 // ---------------- Ajustes visuales ----------------
 const ACCENT = "#c5a47e";
-const LOGO_LIGHT =
-  "/imagenes/CREAR.png";
+const LOGO_LIGHT = "/imagenes/CREAR.png";
 
 // Títulos en ES (si tu SERVICE_DETAIL está en inglés)
 const TITLE_ES: Record<string, string> = {
@@ -24,7 +23,38 @@ const TITLE_ES: Record<string, string> = {
   "gestion-de-proyectos": "GESTIÓN DE PROYECTOS",
 };
 
-// ---------- Metadata por servicio ----------
+/** =================== Helpers imagen =================== **/
+/** Dado "/imagenes/Algo/1.jpg" devuelve las rutas a .avif/.webp/.jpg en el mismo folder y base. */
+function buildFormats(originalPath: string) {
+  const base = originalPath.replace(/\.(avif|webp|jpe?g|png)$/i, "");
+  return {
+    avif: `${base}.avif`,
+    webp: `${base}.webp`,
+    fallback: originalPath, // normalmente .jpg
+  };
+}
+
+/** <picture> con prioridad AVIF → WebP → JPG */
+function PictureFallback({
+  src,
+  alt = "",
+  className = "",
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+}) {
+  const f = buildFormats(src);
+  return (
+    <picture>
+      <source srcSet={f.avif} type="image/avif" />
+      <source srcSet={f.webp} type="image/webp" />
+      <img src={f.fallback} alt={alt} className={className} />
+    </picture>
+  );
+}
+
+/** ================ Metadata por servicio ================ **/
 export function generateMetadata({ params }: PageProps): Metadata {
   const detail = SERVICE_DETAIL[params.slug];
   if (!detail) return {};
@@ -49,7 +79,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
 
   return (
     <div id="home" className="flex min-h-screen flex-col">
-      {/* ======= Cargas Fancybox por CDN (CSS + jQuery + plugin) ======= */}
+      {/* ======= Fancybox por CDN (CSS + jQuery + plugin) ======= */}
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"
@@ -62,7 +92,6 @@ export default function ServiceDetailPage({ params }: PageProps) {
         src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"
         strategy="afterInteractive"
       />
-      {/* Inicialización Fancybox */}
       <Script id="init-fancybox" strategy="afterInteractive">
         {`
           (function() {
@@ -106,10 +135,14 @@ export default function ServiceDetailPage({ params }: PageProps) {
         </div>
 
         {/* Imagen de portada + overlay + textos centrados */}
-        <img src={detail.hero} alt="" className="h-[44rem] w-full object-cover" />
+        <PictureFallback
+          src={detail.hero}
+          alt=""
+          className="h-[44rem] w-full object-cover"
+        />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.35)_0%,rgba(0,0,0,.35)_100%)]" />
 
-        {/* 🔧 AQUÍ EL CAMBIO: centrado perfecto */}
+        {/* Centro */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="px-[1.5rem] text-center">
             <h1 className="[font-family:'Khand',_sans-serif] text-white uppercase tracking-[.02em] leading-[1] text-[clamp(3.2rem,6vw,6.4rem)] font-[700]">
@@ -144,31 +177,28 @@ export default function ServiceDetailPage({ params }: PageProps) {
 
             {/* Galería (2 arriba + 1 grande abajo) con hover y Fancybox */}
             <div className="mt-[2.4rem] grid grid-cols-1 gap-[1.6rem] md:grid-cols-2">
-
               {detail.gallery.map((src, i, arr) => {
-                  // Es el último elemento de la galería
-                  const isLast = i === arr.length - 1;
-
-                  return (
-                    <a
-                      key={src}
-                      href={src}
-                      data-fancybox="gallery"
-                      data-caption="CREAR IMAGEN"
-                      className={`group relative block w-full overflow-hidden transition-all duration-300 ${
-                        isLast
-                          ? "h-[38rem] md:col-span-2" // Última: más alta y de 2 columnas
-                          : "h-[28rem] col-span-1" // Demás: altura estándar y 1 columna
-                      }`}
-                    >
-                      <img
-                        src={src}
-                        alt=""
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] group-hover:shadow-xl"
-                      />
-                    </a>
-                  );
-                })}
+                const isLast = i === arr.length - 1;
+                return (
+                  <a
+                    key={src}
+                    href={src} // apunta al .jpg original; Fancybox lo abrirá
+                    data-fancybox="gallery"
+                    data-caption="CREAR IMAGEN"
+                    className={`group relative block w-full overflow-hidden transition-all duration-300 ${
+                      isLast
+                        ? "h-[38rem] md:col-span-2"
+                        : "h-[28rem] col-span-1"
+                    }`}
+                  >
+                    <PictureFallback
+                      src={src}
+                      alt=""
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] group-hover:shadow-xl"
+                    />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -215,7 +245,6 @@ export default function ServiceDetailPage({ params }: PageProps) {
                 </span>
               </div>
 
-              {/* Botón adicional de volver (útil en móvil) */}
               <Link
                 href="/"
                 className="mt-[1.6rem] inline-block rounded-[.2rem] px-[1.4rem] py-[.8rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white"

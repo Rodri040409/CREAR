@@ -3,16 +3,48 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import DetailScaffold from "@/app/components/DetailScaffold";
-import { PROJECT_DETAIL,PROJECTS } from "@/app/lib/projects";
+import { PROJECT_DETAIL, PROJECTS } from "@/app/lib/projects";
 
 const ACCENT = "#c5a47e";
 
-// ---------- Generar rutas estáticas ----------
+/** -------------------- Helpers -------------------- **/
+/** Dado "/imagenes/Proyectos/Casa21/1.jpg" devuelve las rutas a .avif/.webp/.jpg en el MISMO folder y mismo nombre base. */
+function buildFormats(originalPath: string) {
+  // Soporta .jpg/.jpeg/.png (por si a futuro cambias alguna)
+  const base = originalPath.replace(/\.(avif|webp|jpe?g|png)$/i, "");
+  return {
+    avif: `${base}.avif`,
+    webp: `${base}.webp`,
+    fallback: originalPath, // normalmente .jpg
+  };
+}
+
+/** Imagen con <picture> para priorizar AVIF → WebP → JPG */
+function PictureFallback({
+  src,
+  alt = "",
+  className = "",
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+}) {
+  const f = buildFormats(src);
+  return (
+    <picture>
+      <source srcSet={f.avif} type="image/avif" />
+      <source srcSet={f.webp} type="image/webp" />
+      <img src={f.fallback} alt={alt} className={className} />
+    </picture>
+  );
+}
+
+/** -------------------- Rutas estáticas -------------------- **/
 export function generateStaticParams() {
   return PROJECTS.map((p) => ({ slug: p.slug }));
 }
 
-// ---------- Metadata dinámica ----------
+/** -------------------- Metadata dinámica -------------------- **/
 export function generateMetadata({
   params,
 }: {
@@ -26,7 +58,7 @@ export function generateMetadata({
   };
 }
 
-// ---------- Página principal ----------
+/** -------------------- Página principal -------------------- **/
 export default function ProjectDetailPage({
   params,
 }: {
@@ -56,11 +88,11 @@ export default function ProjectDetailPage({
                 href={d.gallery[0]}
                 data-fancybox="gallery"
                 data-caption={d.title}
-                className="mb-[1.6rem] block overflow-hidden h-[32rem] md:h-[47.6rem]"
+                className="mb-[1.6rem] block h-[32rem] overflow-hidden md:h-[47.6rem]"
               >
-                <img
+                <PictureFallback
                   src={d.gallery[0]}
-                  alt=""
+                  alt={d.title}
                   className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
                 />
               </a>
@@ -73,11 +105,11 @@ export default function ProjectDetailPage({
                   href={src}
                   data-fancybox="gallery"
                   data-caption={d.title}
-                  className="block overflow-hidden h-[22rem] md:h-[28.5rem]"
+                  className="block h-[22rem] overflow-hidden md:h-[28.5rem]"
                 >
-                  <img
+                  <PictureFallback
                     src={src}
-                    alt=""
+                    alt={`${d.title} — imagen ${i + 2}`}
                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
                   />
                 </a>
