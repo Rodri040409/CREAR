@@ -1,4 +1,7 @@
+// src/app/components/News.tsx
 "use client";
+
+/* eslint-disable @next/next/no-page-custom-font */
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -98,46 +101,46 @@ export function SavoyeHomeHeroExact() {
   const [current, setCurrent] = useState(0);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
-  const [isFS, setIsFS] = useState(false);           // estado general de “pantalla completa”
+  const [isFS, setIsFS] = useState(false);           // fullscreen activo (API u overlay)
   const [overlayFS, setOverlayFS] = useState(false); // fullscreen CSS (iOS/mobile)
   const userPausedRef = useRef(false);
 
-  // Eventos video
+  // Eventos video + sincronizar con cambios externos (hardware, SO)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     const onLoaded = () => setDuration(v.duration || 0);
     const onTime = () => setCurrent(v.currentTime || 0);
-    const onPlay = () => {
-      setIsPlaying(true);
-      userPausedRef.current = false;
-    };
+    const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
     const onPause = () => setIsPlaying(false);
+    const onVol = () => { setMuted(v.muted); setVolume(v.muted ? 0 : v.volume ?? 1); };
     v.addEventListener("loadedmetadata", onLoaded);
     v.addEventListener("timeupdate", onTime);
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
+    v.addEventListener("volumechange", onVol);
     return () => {
       v.removeEventListener("loadedmetadata", onLoaded);
       v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
+      v.removeEventListener("volumechange", onVol);
     };
   }, []);
 
-  // Play/pause según visibilidad del hero (ignora cuando está en “pantalla completa”)
+  // Play/pause según visibilidad del hero (ignora cuando está en fullscreen)
   useEffect(() => {
     const el = sectionRef.current;
     const v = videoRef.current;
     if (!el || !v || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(
       (entries) => {
-        if (isFS || overlayFS) return; // no auto-pausar en fullscreen
+        if (isFS || overlayFS) return;
         const e = entries[0];
         if (!e) return;
         const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
         if (visible) {
-          if (!userPausedRef.current) v.play().catch((err) => { void err; });
+          if (!userPausedRef.current) v.play().catch(() => {});
         } else {
           v.pause();
         }
@@ -148,7 +151,7 @@ export function SavoyeHomeHeroExact() {
     return () => io.disconnect();
   }, [isFS, overlayFS]);
 
-  // Fullscreen API (desktop/android)
+  // Fullscreen API (desktop/android) + reflejar overlay
   useEffect(() => {
     const onFsChange = () => {
       const fsEl =
@@ -165,13 +168,21 @@ export function SavoyeHomeHeroExact() {
     };
   }, [overlayFS]);
 
+  // Bloquear scroll del body cuando el overlay está activo
+  useEffect(() => {
+    if (!overlayFS) return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => { document.documentElement.style.overflow = prev; };
+  }, [overlayFS]);
+
   // Acciones
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
       userPausedRef.current = false;
-      v.play().catch((err) => { void err; });
+      v.play().catch(() => {});
     } else {
       userPausedRef.current = true;
       v.pause();
@@ -188,6 +199,7 @@ export function SavoyeHomeHeroExact() {
     const v = videoRef.current;
     if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
+    // iOS ignora volume; igual reflejamos en UI
     v.volume = vol;
     setVolume(vol);
     if (vol > 0 && muted) {
@@ -202,11 +214,24 @@ export function SavoyeHomeHeroExact() {
     setMuted(v.muted);
   };
 
+  const enterOverlay = () => {
+    const v = videoRef.current;
+    // reproducir dentro del MISMO gesto del usuario (iOS policy)
+    if (v && v.paused && !userPausedRef.current) {
+      try { void v.play(); } catch {}
+    }
+    setOverlayFS(true);
+    setIsFS(true);
+  };
+  const exitOverlay = () => {
+    setOverlayFS(false);
+    setIsFS(false);
+  };
+
   const toggleFullscreen = () => {
-    // iOS ⇒ usar overlay (CSS fullscreen). También útil cuando no hay pointer fino.
+    // iOS ⇒ usar overlay CSS con controles nativos
     if (isIOS) {
-      setOverlayFS((p) => !p);
-      setIsFS((p) => !p);
+      overlayFS ? exitOverlay() : enterOverlay();
       return;
     }
     const c = containerRef.current || videoRef.current;
@@ -226,36 +251,17 @@ export function SavoyeHomeHeroExact() {
     }
   };
 
-  // Ajustar medidas al rotar mientras está el overlay activo
-  useEffect(() => {
-    if (!overlayFS) return;
-    const sync = () => {
-      // fuerza un reflow leve cambiando una var; el tamaño usa svh/svw
-      document.documentElement.style.setProperty(
-        "--_tick",
-        String(Date.now() % 1e6)
-      );
-    };
-    window.addEventListener("orientationchange", sync, { passive: true });
-    window.addEventListener("resize", sync, { passive: true });
-    return () => {
-      window.removeEventListener("orientationchange", sync);
-      window.removeEventListener("resize", sync);
-    };
-  }, [overlayFS]);
-
   const fmt = (s: number) => {
     if (!isFinite(s)) return "0:00";
-    const m = Math.floor(s / 60),
-      ss = Math.floor(s % 60);
+    const m = Math.floor(s / 60);
+    const ss = Math.floor(s % 60);
     return `${m}:${ss.toString().padStart(2, "0")}`;
   };
 
   const portrait = isPortrait === true;
-  const showVolume = hasFinePointer && !isIOS; // oculta en móviles (especialmente iOS)
-
-  // Clases estilo overlay fullscreen para móvil/iOS
-  const overlayClass = overlayFS ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0" : "";
+  const showVolume = hasFinePointer && !isIOS; // ocultar en móviles/iOS
+  const overlayClass =
+    overlayFS ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0" : "";
 
   return (
     <header
@@ -298,7 +304,9 @@ export function SavoyeHomeHeroExact() {
               ref={videoRef}
               preload="metadata"
               playsInline
-              controls={false}
+              // En overlay dejamos los controles nativos para iOS/Android
+              controls={overlayFS}
+              muted={muted}
               className={`absolute inset-0 w-full h-full ${overlayFS ? "object-contain" : "object-cover"}`}
             >
               <source src={sources.webm} type="video/webm" />
@@ -306,6 +314,17 @@ export function SavoyeHomeHeroExact() {
               <source src={sources.ogg} type="video/ogg" />
               Tu navegador no soporta el elemento de video.
             </video>
+
+            {/* Botón cerrar overlay (visible solo en overlay) */}
+            {overlayFS && (
+              <button
+                onClick={exitOverlay}
+                aria-label="Cerrar video"
+                className="absolute right-[max(12px,env(safe-area-inset-right))] top-[max(12px,env(safe-area-inset-top))] z-[70] grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
+              >
+                ✕
+              </button>
+            )}
 
             <Controls
               isPlaying={isPlaying}
@@ -338,7 +357,8 @@ export function SavoyeHomeHeroExact() {
               ref={videoRef}
               preload="metadata"
               playsInline
-              controls={false}
+              controls={overlayFS}
+              muted={muted}
               className={overlayFS ? "block w-full h-full object-contain" : "block w-[100vw] h-auto"}
             >
               <source src={sources.webm} type="video/webm" />
@@ -346,6 +366,16 @@ export function SavoyeHomeHeroExact() {
               <source src={sources.ogg} type="video/ogg" />
               Tu navegador no soporta el elemento de video.
             </video>
+
+            {overlayFS && (
+              <button
+                onClick={exitOverlay}
+                aria-label="Cerrar video"
+                className="absolute right-[max(12px,env(safe-area-inset-right))] top-[max(12px,env(safe-area-inset-top))] z-[70] grid h-10 w-10 place-items-center rounded-full bg-black/60 text-white backdrop-blur"
+              >
+                ✕
+              </button>
+            )}
 
             <Controls
               isPlaying={isPlaying}
@@ -397,7 +427,7 @@ function Controls(props: {
     <motion.div
       initial={{ opacity: 0.95, y: 8 }}
       whileHover={{ opacity: 1, y: 0 }}
-      className="absolute left-0 right-0 bottom-0 z-[2] px-[1.5rem] pb-[1.5rem]"
+      className="absolute left-0 right-0 bottom-0 z-[65] px-[1.5rem] pb-[1.5rem]"
     >
       <div className="mx-auto w-full max-w-[114rem]">
         {/* Progreso */}
