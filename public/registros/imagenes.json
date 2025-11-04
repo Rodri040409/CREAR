@@ -9,10 +9,35 @@
     "imagenes\\Hero\\Hero1.webp",
     "imagenes\\Hero\\Hero1.avif"
   ],
+  "Hero\\Hero1_mobile.jpg": [
+    "imagenes\\Hero\\Hero1_mobile.jpg",
+    "imagenes\\Hero\\Hero1_mobile.webp",
+    "imagenes\\Hero\\Hero1_mobile.avif"
+  ],
+  "Hero\\Hero2.jpg": [
+    "imagenes\\Hero\\Hero2.jpg",
+    "imagenes\\Hero\\Hero2.webp",
+    "imagenes\\Hero\\Hero2.avif"
+  ],
+  "Hero\\Hero3.jpg": [
+    "imagenes\\Hero\\Hero3.jpg",
+    "imagenes\\Hero\\Hero3.webp",
+    "imagenes\\Hero\\Hero3.avif"
+  ],
+  "Hero\\Hero4.jpg": [
+    "imagenes\\Hero\\Hero4.jpg",
+    "imagenes\\Hero\\Hero4.webp",
+    "imagenes\\Hero\\Hero4.avif"
+  ],
   "Nosotros\\Nosotros.png": [
     "imagenes\\Nosotros\\Nosotros.png",
     "imagenes\\Nosotros\\Nosotros.webp",
     "imagenes\\Nosotros\\Nosotros.avif"
+  ],
+  "Redes\\whatsapp.png": [
+    "imagenes\\Redes\\whatsapp.png",
+    "imagenes\\Redes\\whatsapp.webp",
+    "imagenes\\Redes\\whatsapp.avif"
   ],
   "Sections\\Construction\\1.jpeg": [
     "imagenes\\Sections\\Construction\\1.jpg",

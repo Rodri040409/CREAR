@@ -6,6 +6,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const TITLE = "Proyecto Casa Diamante, Boca del Rio";
 const VIDEO_SRC = "/videos/NewsVideo.mp4";
 
+/* ==== Helpers de formato (mismo nombre base) ==== */
+function buildVideoSources(originalPath: string) {
+  const base = originalPath.replace(/\.(mp4|webm|ogg|ogv|m4v)$/i, "");
+  return {
+    webm: `${base}.webm`,
+    mp4:  `${base}.mp4`,
+    ogg:  `${base}.ogg`,
+  };
+}
+const sources = buildVideoSources(VIDEO_SRC);
+
 /* ===== utilidades que miden SOLO al montar ===== */
 function useInitialVH() {
   const [vh, setVh] = useState<number>(() => 720);
@@ -110,7 +121,7 @@ export function SavoyeHomeHeroExact() {
         // @ts-ignore
         document.webkitFullscreenElement ||
         null;
-    setIsFS(!!fsEl);
+      setIsFS(!!fsEl);
     };
     document.addEventListener("fullscreenchange", onFsChange);
     // @ts-ignore
@@ -160,9 +171,7 @@ export function SavoyeHomeHeroExact() {
     <header
       ref={sectionRef}
       className="relative w-full overflow-hidden bg-white"
-      style={{
-        height: portrait ? undefined : vh, // desktop ocupa viewport
-      }}
+      style={{ height: portrait ? undefined : vh }}
     >
       {fonts}
 
@@ -183,7 +192,7 @@ export function SavoyeHomeHeroExact() {
 
       {/* ====== VIDEO AREA ====== */}
       {!portrait ? (
-        // ----- Desktop / Landscape: igual que antes (absolute + object-cover) -----
+        // Desktop / Landscape
         <div
           ref={containerRef}
           className="absolute left-0 right-0 bottom-0 z-[1] bg-black"
@@ -197,13 +206,17 @@ export function SavoyeHomeHeroExact() {
           >
             <video
               ref={videoRef}
-              src={VIDEO_SRC}
               preload="metadata"
               playsInline
               controls={false}
               className="absolute inset-0 w-full h-full object-cover"
-            />
-            {/* Controles */}
+            >
+              <source src={sources.webm} type="video/webm" />
+              <source src={sources.mp4}  type="video/mp4" />
+              <source src={sources.ogg}  type="video/ogg" />
+              Tu navegador no soporta el elemento de video.
+            </video>
+
             <Controls
               isPlaying={isPlaying}
               muted={muted}
@@ -221,27 +234,28 @@ export function SavoyeHomeHeroExact() {
           </motion.div>
         </div>
       ) : (
-        // ----- Móvil / Portrait: SIN bordes; alto = solo el del video -----
-        <div
-          className="z-[1] bg-transparent"
-          style={{ marginTop: titleH }}
-        >
+        // Móvil / Portrait
+        <div className="z-[1] bg-transparent" style={{ marginTop: titleH }}>
           <motion.div
             ref={containerRef}
-            className="relative mx-auto w-[100vw]" // ancho total del viewport
+            className="relative mx-auto w-[100vw]"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.2, 0, 0, 1], delay: 0.1 }}
           >
             <video
               ref={videoRef}
-              src={VIDEO_SRC}
               preload="metadata"
               playsInline
               controls={false}
-              className="block w-[100vw] h-auto" // alto lo dicta el propio video
-            />
-            {/* Controles sobre el video */}
+              className="block w-[100vw] h-auto"
+            >
+              <source src={sources.webm} type="video/webm" />
+              <source src={sources.mp4}  type="video/mp4" />
+              <source src={sources.ogg}  type="video/ogg" />
+              Tu navegador no soporta el elemento de video.
+            </video>
+
             <Controls
               isPlaying={isPlaying}
               muted={muted}
@@ -340,7 +354,7 @@ function Controls(props: {
               {muted || volume === 0 ? (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M5 10v4h4l5 5V5l-5 5H5zm12.5 2l2.5 2.5-1.5 1.5L16 13.5l-2.5 2.5-1.5-1.5L14.5 12 12 9.5l1.5-1.5L16 10.5l2.5-2.5 1.5 1.5L17.5 12z"/>
-              </svg>
+                </svg>
               ) : (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M5 10v4h4l5 5V5l-5 5H5z"/>

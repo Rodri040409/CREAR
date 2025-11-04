@@ -13,6 +13,12 @@ type PageProps = { params: { slug: string } };
 const ACCENT = "#c5a47e";
 const LOGO_LIGHT = "/imagenes/CREAR.png";
 
+// WhatsApp (usa AVIF/WEBP/PNG con el mismo nombre base)
+const WA_ICON = "/imagenes/Redes/whatsapp.png";
+const WA_NUMBER_E164 = "522961205199"; // +52 296 120 5199 (formato E.164)
+const WA_TEXT = "Hola CREAR, me gustaría pedir información.";
+const WA_URL = `https://wa.me/${WA_NUMBER_E164}?text=${encodeURIComponent(WA_TEXT)}`;
+
 // Títulos en ES (si tu SERVICE_DETAIL está en inglés)
 const TITLE_ES: Record<string, string> = {
   "diseno-arquitectonico": "DISEÑO ARQUITECTÓNICO",
@@ -61,7 +67,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
   const title = TITLE_ES[params.slug] ?? detail.title;
   return {
     title: `${title} | Servicios`,
-    description: detail.paragraphs[0],
+    description: detail.paragraphs?.[0] ?? title,
   };
 }
 
@@ -84,10 +90,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"
       />
-      <Script
-        src="https://code.jquery.com/jquery-3.6.0.min.js"
-        strategy="afterInteractive"
-      />
+      <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="afterInteractive" />
       <Script
         src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"
         strategy="afterInteractive"
@@ -135,11 +138,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
         </div>
 
         {/* Imagen de portada + overlay + textos centrados */}
-        <PictureFallback
-          src={detail.hero}
-          alt=""
-          className="h-[44rem] w-full object-cover"
-        />
+        <PictureFallback src={detail.hero} alt="" className="h-[44rem] w-full object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.35)_0%,rgba(0,0,0,.35)_100%)]" />
 
         {/* Centro */}
@@ -167,10 +166,7 @@ export default function ServiceDetailPage({ params }: PageProps) {
           {/* Columna principal */}
           <div className="lg:col-span-8">
             {detail.paragraphs.map((p, i) => (
-              <p
-                key={i}
-                className="mb-[1.6rem] text-[1.4rem] leading-[1.9] text-[#6f6f6f]"
-              >
+              <p key={i} className="mb-[1.6rem] text-[1.4rem] leading-[1.9] text-[#6f6f6f]">
                 {p}
               </p>
             ))}
@@ -182,13 +178,11 @@ export default function ServiceDetailPage({ params }: PageProps) {
                 return (
                   <a
                     key={src}
-                    href={src} // apunta al .jpg original; Fancybox lo abrirá
+                    href={src} // Fancybox abrirá el original
                     data-fancybox="gallery"
-                    data-caption="CREAR IMAGEN"
+                    data-caption={title}
                     className={`group relative block w-full overflow-hidden transition-all duration-300 ${
-                      isLast
-                        ? "h-[38rem] md:col-span-2"
-                        : "h-[28rem] col-span-1"
+                      isLast ? "h-[38rem] md:col-span-2" : "h-[28rem] col-span-1"
                     }`}
                   >
                     <PictureFallback
@@ -231,28 +225,44 @@ export default function ServiceDetailPage({ params }: PageProps) {
             </div>
 
             {/* ¿NECESITAS AYUDA? */}
-            <div className="mt-[2.4rem] rounded-sm bg-[#f5eee6] p-[1.6rem]">
-              <h3 className="[font-family:'Khand',_sans-serif] mb-[1rem] text-[2rem] font-[700] tracking-[.01em] text-[#111]">
-                ¿NECESITAS AYUDA?
-              </h3>
-              <p className="text-[1.35rem] leading-[1.8] text-[#6f6f6f]">
-                Llámanos o visítanos; respondemos la mayoría de consultas en menos de 24 horas hábiles. Estaremos encantados de ayudarte.
-              </p>
-              <div className="mt-[1.2rem] flex items-center gap-3">
-                <span className="text-[1.6rem]">☏</span>
-                <span className="text-[1.4rem] font-medium text-[#111]">
-                  296 120 5199
-                </span>
-              </div>
+<div className="mt-[2.4rem] rounded-sm bg-[#f5eee6] p-[1.6rem]">
+  <h3 className="[font-family:'Khand',_sans-serif] mb-[1rem] text-[2rem] font-[700] tracking-[.01em] text-[#111]">
+    ¿NECESITAS AYUDA?
+  </h3>
+  <p className="text-[1.35rem] leading-[1.8] text-[#6f6f6f]">
+    Llámanos o visítanos; respondemos la mayoría de consultas en menos de 24 horas hábiles. Estaremos encantados de ayudarte.
+  </p>
 
-              <Link
-                href="/"
-                className="mt-[1.6rem] inline-block rounded-[.2rem] px-[1.4rem] py-[.8rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white"
-                style={{ backgroundColor: ACCENT }}
-              >
-                ← Volver al inicio
-              </Link>
-            </div>
+  {/* Fila responsiva: teléfono (WhatsApp) + botón. En móvil se apilan, en desktop en fila */}
+  <div className="mt-[1.2rem] flex flex-col sm:flex-row sm:items-center gap-[1.2rem] sm:gap-[1.6rem] flex-wrap">
+    {/* Teléfono → WhatsApp */}
+    <a
+      href={WA_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-3 text-[#111] hover:opacity-80 transition shrink-0"
+      aria-label="Escríbenos por WhatsApp"
+    >
+      {/* Icono con AVIF → WebP → PNG */}
+      <PictureFallback
+        src={WA_ICON}
+        alt="WhatsApp"
+        className="h-[2.2rem] w-[2.2rem] object-contain"
+      />
+      <span className="text-[1.4rem] font-medium">296 120 5199</span>
+    </a>
+
+    {/* Botón volver */}
+    <Link
+      href="/"
+      className="inline-flex items-center justify-center rounded-[.2rem] px-[1.4rem] py-[.8rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white shrink-0"
+      style={{ backgroundColor: ACCENT }}
+    >
+      ← Volver al inicio
+    </Link>
+  </div>
+</div>
+
           </aside>
         </div>
       </section>

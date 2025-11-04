@@ -45,7 +45,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     slug: "red-electrica-fracc-la-cruz",
-    title: "Red Electrica Fracc. La Cruz",
+    title: "Red Eléctrica Fracc. La Cruz",
     category: "",
     thumb: "/imagenes/Proyectos/Red_Electrica_Frac_LaCruz/7.jpg",
     hero:  "/imagenes/Proyectos/Red_Electrica_Frac_LaCruz/3.jpg",
@@ -65,7 +65,7 @@ export type ProjectDetail = {
   breadcrumb: string; // aparece bajo el título del hero
   hero: string;
   paragraphs: string[]; // texto descriptivo (columna derecha)
-  gallery: string[]; // 👈 CAMBIO: ¡Ahora es un array de strings de tamaño variable!
+  gallery: string[]; // array de imágenes
   facts: { label: string; value: string }[]; // panel de datos
 };
 
@@ -74,10 +74,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "PISCINA BOCA",
     breadcrumb: "Proyectos",
     hero: PROJECTS[0].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/PiscinaBoca/1.jpg",
       "/imagenes/Proyectos/PiscinaBoca/2.jpg",
@@ -86,12 +83,11 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
       "/imagenes/Proyectos/PiscinaBoca/5.jpg",
       "/imagenes/Proyectos/PiscinaBoca/6.jpg",
       "/imagenes/Proyectos/PiscinaBoca/7.jpg",
-      
     ],
     facts: [
-      { label: "Ubicación", value: "Boca del Rio, Ver." },
+      { label: "Ubicación", value: "Boca del Río, Ver." },
       { label: "Cliente", value: "Privado" },
-      { label: "Obra", value: "Diseño y construcción de piscina organica" },
+      { label: "Obra", value: "Diseño y construcción de piscina orgánica" },
       { label: "Diseño y construcción", value: "CREAR estudio de arquitectura" },
       { label: "Perito responsable", value: "Arq. Carlos Ruiz Estrada" },
     ],
@@ -101,10 +97,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "CASA BRIONES 01",
     breadcrumb: "Proyectos",
     hero: PROJECTS[1].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/CasaBriones01/1.jpg",
       "/imagenes/Proyectos/CasaBriones01/3.jpg",
@@ -121,7 +114,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     facts: [
       { label: "Ubicación", value: "Coatepec, Ver." },
       { label: "Cliente", value: "Privado" },
-      { label: "Obra", value: "Casa habitación, materiales acabado aparente" },
+      { label: "Obra", value: "Casa habitación, materiales de acabado aparente" },
       { label: "Diseño y construcción", value: "CREAR estudio de arquitectura" },
       { label: "Perito responsable", value: "Arq. Carlos Ruiz Estrada" },
     ],
@@ -131,10 +124,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "PISCINA COAPEXPAN",
     breadcrumb: "Proyectos",
     hero: PROJECTS[2].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/PiscinaCoapexpan/1.jpg",
       "/imagenes/Proyectos/PiscinaCoapexpan/2.jpg",
@@ -147,7 +137,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     facts: [
       { label: "Ubicación", value: "Xalapa, Ver." },
       { label: "Cliente", value: "Privado" },
-      { label: "Obra", value: "Diseño y contrucción de piscina y jacuzzi" },
+      { label: "Obra", value: "Diseño y construcción de piscina y jacuzzi" },
       { label: "Diseño y construcción", value: "CREAR estudio de arquitectura" },
       { label: "Perito responsable", value: "Arq. Carlos Ruiz Estrada" },
     ],
@@ -157,10 +147,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "CASA 21",
     breadcrumb: "Proyectos",
     hero: PROJECTS[3].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/Casa21/1.jpg",
       "/imagenes/Proyectos/Casa21/2.jpg",
@@ -187,10 +174,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "Pavimentación Calle Huazontle",
     breadcrumb: "Proyectos",
     hero: PROJECTS[4].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/Pavimentacion_Calle_Huazontle/1.jpg",
       "/imagenes/Proyectos/Pavimentacion_Calle_Huazontle/2.jpg",
@@ -209,20 +193,17 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     facts: [
       { label: "Ubicación", value: "Xalapa, Ver." },
       { label: "Cliente", value: "Municipio de Xalapa, Ver." },
-      { label: "Obra", value: "Construcción de guarniciones, banquetas y pavimento hidraulico" },
+      { label: "Obra", value: "Construcción de guarniciones, banquetas y pavimento hidráulico" },
       { label: "Diseño y construcción", value: "CREAR estudio de arquitectura" },
       { label: "Perito responsable", value: "Arq. Carlos Ruiz Estrada / Ing. Claudio Cambambia" },
     ],
   },
 
   "red-electrica-fracc-la-cruz": {
-    title: "Red Electrica Fracc. La Cruz",
+    title: "Red Eléctrica Fracc. La Cruz",
     breadcrumb: "Proyectos",
     hero: PROJECTS[5].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/Red_Electrica_Frac_LaCruz/1.jpg",
       "/imagenes/Proyectos/Red_Electrica_Frac_LaCruz/2.jpg",
@@ -235,7 +216,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     facts: [
       { label: "Ubicación", value: "Coatepec, Ver." },
       { label: "Cliente", value: "Privado" },
-      { label: "Obra", value: "Red electrica, fraccionamiento La Cruz" },
+      { label: "Obra", value: "Red eléctrica, fraccionamiento La Cruz" },
       { label: "Diseño y construcción", value: "CREAR estudio de arquitectura" },
       { label: "Perito responsable", value: "Ing. Claudio Cambambia" },
     ],
@@ -245,10 +226,7 @@ export const PROJECT_DETAIL: Record<string, ProjectDetail> = {
     title: "Rehabilitación de oficinas",
     breadcrumb: "Proyectos",
     hero: PROJECTS[6].hero,
-    paragraphs: [
-      "",
-      "",
-    ],
+    paragraphs: ["", ""],
     gallery: [
       "/imagenes/Proyectos/Rehabilitacion_Oficinas/1.jpg",
       "/imagenes/Proyectos/Rehabilitacion_Oficinas/2.jpg",

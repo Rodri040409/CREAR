@@ -8,39 +8,49 @@ import { PROJECT_DETAIL, PROJECTS } from "@/app/lib/projects";
 const ACCENT = "#c5a47e";
 
 /** -------------------- Helpers -------------------- **/
-/** Dado "/imagenes/Proyectos/Casa21/1.jpg" devuelve las rutas a .avif/.webp/.jpg en el MISMO folder y mismo nombre base. */
 function buildFormats(originalPath: string) {
-  // Soporta .jpg/.jpeg/.png (por si a futuro cambias alguna)
   const base = originalPath.replace(/\.(avif|webp|jpe?g|png)$/i, "");
   return {
     avif: `${base}.avif`,
     webp: `${base}.webp`,
-    fallback: originalPath, // normalmente .jpg
+    fallback: originalPath,
   };
 }
 
-/** Imagen con <picture> para priorizar AVIF → WebP → JPG */
 function PictureFallback({
   src,
   alt = "",
   className = "",
+  sizes = "(min-width: 1024px) 66vw, 100vw",
+  loading = "lazy",
+  decoding = "async",
 }: {
   src: string;
   alt?: string;
   className?: string;
+  sizes?: string;
+  loading?: "lazy" | "eager";
+  decoding?: "auto" | "sync" | "async";
 }) {
   const f = buildFormats(src);
   return (
     <picture>
       <source srcSet={f.avif} type="image/avif" />
       <source srcSet={f.webp} type="image/webp" />
-      <img src={f.fallback} alt={alt} className={className} />
+      <img
+        src={f.fallback}
+        alt={alt}
+        className={className}
+        sizes={sizes}
+        loading={loading}
+        decoding={decoding}
+      />
     </picture>
   );
 }
 
 /** -------------------- Rutas estáticas -------------------- **/
-export function generateStaticParams() {
+export function generateStaticParams(): { slug: string }[] {
   return PROJECTS.map((p) => ({ slug: p.slug }));
 }
 
@@ -54,7 +64,7 @@ export function generateMetadata({
   if (!d) return {};
   return {
     title: `${d.title} | Proyectos`,
-    description: d.paragraphs[0],
+    description: d.paragraphs[0] || d.title,
   };
 }
 
@@ -67,7 +77,7 @@ export default function ProjectDetailPage({
   const d = PROJECT_DETAIL[params.slug];
   if (!d) notFound();
 
-  const parts = (d.breadcrumb || "").split("/").map((s) => s.trim());
+  const parts = (d.breadcrumb || "").split("/").map((s) => s.trim()).filter(Boolean);
   const left = parts[0] ?? "";
   const right = parts.slice(1).join(" / ");
 
@@ -78,7 +88,6 @@ export default function ProjectDetailPage({
       breadcrumbLeft={left}
       breadcrumbRight={right}
     >
-      {/* ====== Cuerpo “Project Page” ====== */}
       <section className="relative py-[6rem]">
         <div className="mx-auto grid w-full max-w-[114rem] grid-cols-1 gap-[3.2rem] px-[1.5rem] lg:grid-cols-12">
           {/* Galería principal */}
@@ -94,6 +103,7 @@ export default function ProjectDetailPage({
                   src={d.gallery[0]}
                   alt={d.title}
                   className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+                  sizes="(min-width:1024px) 66vw, 100vw"
                 />
               </a>
             )}
@@ -111,6 +121,7 @@ export default function ProjectDetailPage({
                     src={src}
                     alt={`${d.title} — imagen ${i + 2}`}
                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+                    sizes="(min-width:1024px) 33vw, 100vw"
                   />
                 </a>
               ))}
@@ -121,10 +132,7 @@ export default function ProjectDetailPage({
           <aside className="lg:col-span-4">
             <div className="space-y-[1.2rem]">
               {d.paragraphs.map((p, i) => (
-                <p
-                  key={i}
-                  className="text-[1.4rem] leading-[1.9] text-[#6f6f6f]"
-                >
+                <p key={i} className="text-[1.4rem] leading-[1.9] text-[#6f6f6f]">
                   {p}
                 </p>
               ))}

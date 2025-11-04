@@ -17,7 +17,6 @@ const PATTERN_DESKTOP: ("L" | "R")[] = ["L", "R", "R", "L", "R", "L"];
  */
 const ORDER = {
   desktop: [
-    // <<< EJEMPLO: ajusta a tu gusto >>>
     "casa-21",
     "pavimentacion-calle-huazontle",
     "casa-briones-01",
@@ -27,7 +26,6 @@ const ORDER = {
     "red-electrica-fracc-la-cruz",
   ],
   mobile: [
-    // <<< EJEMPLO móvil: primero lo que quieras destacar en phones >>>
     "casa-21",
     "casa-briones-01",
     "rehabilitacion-oficinas",
@@ -38,15 +36,47 @@ const ORDER = {
   ],
 };
 
+/* ------------ Helpers para imágenes con fallback (AVIF → WebP → JPG) ------------ */
+function buildFormats(originalPath: string) {
+  const base = originalPath.replace(/\.(avif|webp|jpe?g|png)$/i, "");
+  return { avif: `${base}.avif`, webp: `${base}.webp`, fallback: originalPath };
+}
+
+function PictureFallback({
+  src,
+  alt = "",
+  className = "",
+}: {
+  src: string;
+  alt?: string;
+  className?: string;
+}) {
+  const f = buildFormats(src);
+  return (
+    <picture>
+      <source srcSet={f.avif} type="image/avif" />
+      <source srcSet={f.webp} type="image/webp" />
+      <img src={f.fallback} alt={alt} className={className} />
+    </picture>
+  );
+}
+
+/* ------------------------------- Responsive ------------------------------- */
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
-    const handler = (e: MediaQueryListEvent | MediaQueryList) =>
-      setIsDesktop("matches" in e ? e.matches : (e as MediaQueryList).matches);
-    handler(mq);
-    mq.addEventListener?.("change", handler as (e: MediaQueryListEvent) => void);
-    return () => mq.removeEventListener?.("change", handler as (e: MediaQueryListEvent) => void);
+    const update = () => setIsDesktop(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+
+    update();
+    if (mq.addEventListener) mq.addEventListener("change", onChange);
+    else mq.addListener(onChange);
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", onChange);
+      else mq.removeListener(onChange);
+    };
   }, []);
   return isDesktop;
 }
@@ -55,7 +85,7 @@ function useIsDesktop() {
 function applyOrder(items: ProjectItem[], orderList: string[] | undefined) {
   if (!orderList || orderList.length === 0) return items;
   const pos = new Map(orderList.map((slug, i) => [slug, i]));
-  const BIG = 1e9; // envia al final lo no listado
+  const BIG = 1e9; // envía al final lo no listado
   return items.slice().sort(
     (a, b) => (pos.get(a.slug) ?? BIG) - (pos.get(b.slug) ?? BIG)
   );
@@ -159,12 +189,10 @@ function Item({ p }: { p: ProjectItem }) {
   return (
     <div className="relative pl-[3rem] pb-[6rem] md:pl-[9rem] md:pb-[9rem]">
       <Link href={`/proyectos/${p.slug}`} className="block overflow-hidden">
-        <img
+        <PictureFallback
           src={p.thumb}
           alt={p.title}
           className="block w-full h-auto select-none object-cover transition-transform duration-300 hover:scale-95"
-          loading="lazy"
-          decoding="async"
         />
       </Link>
 
