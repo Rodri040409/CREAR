@@ -282,8 +282,12 @@ export default function SavoyeTopExact() {
                     href={s.cta}
                     target="_blank"
                     rel="noopener"
-                    className="absolute bottom-[14vh] left-1/2 -translate-x-1/2 rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white"
-                    style={{ backgroundColor: ACCENT }}
+                    className="absolute left-1/2 -translate-x-1/2 rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white shadow-[0_10px_30px_rgba(0,0,0,.28)]"
+                    style={{
+                      backgroundColor: ACCENT,
+                      // coloca el botón más ARRIBA y respeta el notch
+                      bottom: "max(96px, calc(env(safe-area-inset-bottom, 0px) + 124px))",
+                    }}
                   >
                     WhatsApp
                   </a>
@@ -371,14 +375,26 @@ export default function SavoyeTopExact() {
           </button>
         </div>
 
-        {/* Mensaje móvil */}
+        {/* Mensaje móvil con fondo (pill) */}
         <div
           className="absolute left-1/2 z-50 -translate-x-1/2 lg:hidden text-center"
-          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 60px)" }}
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}
         >
-          <p className="px-4 text-[1.3rem] leading-tight text-white/90">
-            Explora nuestros servicios: toca los recuadros inferiores
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+            className="inline-flex max-w-[92vw] items-center justify-center
+                      rounded-[.6rem] px-3 py-2
+                      bg-black/55 backdrop-blur-[2px]
+                      ring-1 ring-white/10
+                      shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+          >
+            <p className="text-[1.3rem] leading-tight text-white
+                          [text-shadow:0_1px_0_rgba(0,0,0,.35)]">
+              Explora nuestros servicios: toca los recuadros inferiores
+            </p>
+          </motion.div>
         </div>
 
         {/* Bullets móvil */}

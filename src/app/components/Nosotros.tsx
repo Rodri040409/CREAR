@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 
 export default function SavoyeAboutExact() {
-  // Acento del tema (no visible aquí, lo dejamos por consistencia)
   const ACCENT = "#c5a47e";
 
   const paragraphs = [
@@ -12,20 +11,17 @@ export default function SavoyeAboutExact() {
     "Trabajamos contigo con un proceso claro: escuchamos, proponemos, calendarizamos, ejecutamos y entregamos. Comunicación transparente, tiempos definidos y un solo frente responsable. ¿Listo para transformar tu espacio con Crear?",
   ];
 
-  const aboutImg =
-    "/imagenes/Nosotros/Nosotros.png";
+  const aboutImg = "/imagenes/Nosotros/Nosotros.png";
 
   return (
     <section id="about" className="bg-white antialiased">
-      {/* Fuentes EXACTAS del tema */}
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;700&display=swap"
       />
 
-      {/* container Bootstrap (≥1200px: 1140px) → 114rem con tu base 1rem=10px */}
-      <div className="mx-auto w-full max-w-[114rem] px-[1.5rem] py-[12rem]">
-        {/* row 12 cols / gutter ≈ 30px */}
+      {/* Antes: py-[12rem] → compactamos en móvil */}
+      <div className="mx-auto w-full max-w-[114rem] px-[1.5rem] py-[1rem] md:py-[10rem] lg:py-[12rem]">
         <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-[3rem] items-start">
           {/* col-md-7 */}
           <motion.div
@@ -35,24 +31,24 @@ export default function SavoyeAboutExact() {
             viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
             transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
           >
-            {/* .section-title del tema */}
             <h2
               className="
                 uppercase text-[#272727] font-[500]
-                mb-[2.5rem] leading-[1em]
+                leading-[1em]
                 [font-family:'Khand',_sans-serif]
-                text-[6rem] tracking-[0.05rem]
+                text-[4.2rem] sm:text-[5rem] md:text-[6rem]
+                tracking-[0.05rem]
+                mb-[1.6rem] md:mb-[2.5rem]
               "
             >
               Sobre nosotros
             </h2>
 
-            {/* p del tema (Khand 17px, lh 1.75em, #555, mb 20px, ls .25px) */}
             <div className="[font-family:'Khand',_sans-serif] text-[#555]">
               {paragraphs.map((p, i) => (
                 <p
                   key={i}
-                  className="text-[1.7rem] leading-[1.75em] tracking-[0.025rem] mb-[2rem]"
+                  className="text-[1.6rem] md:text-[1.7rem] leading-[1.75em] tracking-[0.025rem] mb-[1.2rem] md:mb-[2rem]"
                 >
                   {p}
                 </p>
