@@ -15,7 +15,7 @@ const LOGO_LIGHT = "/imagenes/CREAR.png";
 
 // WhatsApp (usa AVIF/WEBP/PNG con el mismo nombre base)
 const WA_ICON = "/imagenes/Redes/whatsapp.png";
-const WA_NUMBER_E164 = "522961205199"; // +52 296 120 5199 (formato E.164)
+const WA_NUMBER_E164 = "2961205199"; // +52 296 120 5199 (formato E.164)
 const WA_TEXT = "Hola CREAR, me gustaría pedir información.";
 const WA_URL = `https://wa.me/${WA_NUMBER_E164}?text=${encodeURIComponent(WA_TEXT)}`;
 
