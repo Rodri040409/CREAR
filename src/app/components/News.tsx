@@ -1,48 +1,42 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-/* =======================
-   HERO — Slider exacto
-   ======================= */
+const TITLE = "Proyecto Casa Diamante, Boca del Rio";
+const VIDEO_SRC = "/videos/NewsVideo.mp4";
 
-type Slide = {
-  img: string;
-  kicker: string;
-  title: string;
-  desc: string;
-  href: string;
-};
-
-const SLIDES: Slide[] = [
-  {
-    img: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/1.jpg",
-    kicker: "Residental",
-    title: "Blackspace House",
-    desc:
-      "Architecture viverra tellus nec massa dictum the blackspace euismoe.\nCurabitur viverra the posuere hose aukue velition.",
-    href: "https://shtheme.org/demosd/savoye/index87f3.html?project=arch-cloud-honna-didenton-villa",
-  },
-  {
-    img: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/2.jpg",
-    kicker: "Residental",
-    title: "One Stone House",
-    desc:
-      "Architecture viverra tellus nec massa dictum the blackspace euismoe.\nCurabitur viverra the posuere hose aukue velition.",
-    href: "https://shtheme.org/demosd/savoye/index9339.html?project=brown-monara-house-ottova-canada",
-  },
-  {
-    img: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/3.jpg",
-    kicker: "Residental",
-    title: "Collin Bea House",
-    desc:
-      "Architecture viverra tellus nec massa dictum the blackspace euismoe.\nCurabitur viverra the posuere hose aukue velition.",
-    href: "https://shtheme.org/demosd/savoye/index4910.html?project=twin-forestland-home",
-  },
-];
+/* ===== utilidades que miden SOLO al montar ===== */
+function useInitialVH() {
+  const [vh, setVh] = useState<number>(() => 720);
+  useEffect(() => { setVh(window.innerHeight || 720); }, []);
+  return vh;
+}
+function useInitialElHeight<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [h, setH] = useState<number>(90);
+  useEffect(() => { if (ref.current) setH(ref.current.offsetHeight || 90); }, []);
+  return { ref, h };
+}
+/* detectar orientación (solo reacciona cuando ROTA, no por resize fino) */
+function useOrientation() {
+  const [portrait, setPortrait] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(orientation: portrait)");
+    const set = (e: MediaQueryList | MediaQueryListEvent) =>
+      setPortrait("matches" in e ? e.matches : (e as MediaQueryList).matches);
+    set(mq);
+    mq.addEventListener?.("change", set as (e: MediaQueryListEvent) => void);
+    return () => mq.removeEventListener?.("change", set as (e: MediaQueryListEvent) => void);
+  }, []);
+  return portrait;
+}
 
 export function SavoyeHomeHeroExact() {
+  const vh = useInitialVH();
+  const { ref: titleRef, h: titleH } = useInitialElHeight<HTMLDivElement>();
+  const isPortrait = useOrientation();
+
   const fonts = useMemo(
     () => (
       <link
@@ -53,111 +47,346 @@ export function SavoyeHomeHeroExact() {
     []
   );
 
-  const [i, setI] = useState(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  // Estado controles
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
+  const [isFS, setIsFS] = useState(false);
+  const userPausedRef = useRef(false);
+
+  // Eventos video
   useEffect(() => {
-    const id = setInterval(() => setI((p) => (p + 1) % SLIDES.length), 6000);
-    return () => clearInterval(id);
+    const v = videoRef.current;
+    if (!v) return;
+    const onLoaded = () => setDuration(v.duration || 0);
+    const onTime = () => setCurrent(v.currentTime || 0);
+    const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
+    const onPause = () => setIsPlaying(false);
+    v.addEventListener("loadedmetadata", onLoaded);
+    v.addEventListener("timeupdate", onTime);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    return () => {
+      v.removeEventListener("loadedmetadata", onLoaded);
+      v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+    };
   }, []);
 
+  // Play/pause según visibilidad del hero
+  useEffect(() => {
+    const el = sectionRef.current;
+    const v = videoRef.current;
+    if (!el || !v || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        if (!e) return;
+        const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
+        if (visible) {
+          if (!userPausedRef.current) v.play().catch(() => {});
+        } else {
+          v.pause();
+        }
+      },
+      { threshold: [0, 0.25, 0.55, 0.75, 1] }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Fullscreen
+  useEffect(() => {
+    const onFsChange = () => {
+      const fsEl =
+        document.fullscreenElement ||
+        // @ts-ignore
+        document.webkitFullscreenElement ||
+        null;
+    setIsFS(!!fsEl);
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    // @ts-ignore
+    document.addEventListener("webkitfullscreenchange", onFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      // @ts-ignore
+      document.removeEventListener("webkitfullscreenchange", onFsChange);
+    };
+  }, []);
+
+  // Acciones
+  const togglePlay = () => {
+    const v = videoRef.current; if (!v) return;
+    if (v.paused) { userPausedRef.current = false; v.play().catch(() => {}); }
+    else { userPausedRef.current = true; v.pause(); }
+  };
+  const handleSeek = (val: number) => {
+    const v = videoRef.current; if (!v) return;
+    const t = Math.min(Math.max(val, 0), duration || 0);
+    v.currentTime = t; setCurrent(t);
+  };
+  const handleVolume = (val: number) => {
+    const v = videoRef.current; if (!v) return;
+    const vol = Math.min(Math.max(val, 0), 1);
+    v.volume = vol; setVolume(vol);
+    if (vol > 0 && muted) { v.muted = false; setMuted(false); }
+  };
+  const toggleMute = () => {
+    const v = videoRef.current; if (!v) return;
+    v.muted = !v.muted; setMuted(v.muted);
+  };
+  const toggleFullscreen = () => {
+    const c = containerRef.current; if (!c) return;
+    // @ts-ignore
+    (!isFS ? (c.requestFullscreen || c.webkitRequestFullscreen) : (document.exitFullscreen || document.webkitExitFullscreen))?.call(!isFS ? c : document);
+  };
+  const fmt = (s: number) => {
+    if (!isFinite(s)) return "0:00";
+    const m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    return `${m}:${ss.toString().padStart(2, "0")}`;
+  };
+
+  const portrait = isPortrait === true;
+
   return (
-    <header className="relative min-h-[100vh] overflow-hidden">
+    <header
+      ref={sectionRef}
+      className="relative w-full overflow-hidden bg-white"
+      style={{
+        height: portrait ? undefined : vh, // desktop ocupa viewport
+      }}
+    >
       {fonts}
 
-      {/* Fondo + overlay */}
-      <div className="absolute inset-0">
-        <AnimatePresence mode="wait">
+      {/* Título fijo arriba */}
+      <motion.div
+        ref={titleRef}
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.2, 0, 0, 1] }}
+        className="absolute top-0 left-0 right-0 z-[2]"
+      >
+        <div className="mx-auto w-full max-w-[114rem] px-[1.5rem] py-[2.4rem]">
+          <h1 className="[font-family:'Khand',_sans-serif] text-black text-center uppercase font-[500] leading-[1.1] text-[clamp(2.8rem,5.5vw,6.2rem)] m-0">
+            {TITLE}
+          </h1>
+        </div>
+      </motion.div>
+
+      {/* ====== VIDEO AREA ====== */}
+      {!portrait ? (
+        // ----- Desktop / Landscape: igual que antes (absolute + object-cover) -----
+        <div
+          ref={containerRef}
+          className="absolute left-0 right-0 bottom-0 z-[1] bg-black"
+          style={{ top: titleH }}
+        >
           <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
-            style={{
-              backgroundImage: `url(${SLIDES[i].img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className="absolute inset-0"
-          />
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
-
-      {/* Caption */}
-      <div className="relative z-[2] flex h-[100vh] items-center">
-        <div className="mx-auto w-full max-w-[114rem] px-[1.5rem]">
-          <div className="md:w-8/12 mt-[3rem]">
-            <div className="inline-block">
-              <motion.h6
-                className="[font-family:'Khand',_sans-serif] text-[1.7rem] font-[400] uppercase tracking-[0.4rem] text-[#c5a47e] mb-[1rem]"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.2 }}
-              >
-                {SLIDES[i].kicker}
-              </motion.h6>
-
-              <motion.h1
-                className="[font-family:'Khand',_sans-serif] text-white uppercase font-[500] leading-[1.1] text-[clamp(4.4rem,7.2vw,9.5rem)] mb-0"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.35 }}
-              >
-                {SLIDES[i].title}
-              </motion.h1>
-
-              <motion.p
-                className="text-white text-[1.7rem] leading-[1.6] mt-[1.2rem] mr-[1.5rem]"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.55 }}
-              >
-                {SLIDES[i].desc.split("\n").map((line, k) => (
-                  <span key={k} className="block">
-                    {line}
-                  </span>
-                ))}
-              </motion.p>
-
-              <motion.a
-                href={SLIDES[i].href}
-                className="relative inline-block mt-[2.4rem] bg-[#c5a47e] text-white uppercase tracking-[0.14em] text-[1.3rem] leading-[1] py-[1.4rem] pl-[5rem] pr-[2.4rem] font-[500]"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.7 }}
-              >
-                <span
-                  className="pointer-events-none absolute left-[2rem] top-1/2 -translate-y-1/2 h-[1px] w-[0] bg-white transition-all duration-200 group-hover:w-[3rem]"
-                  aria-hidden
-                />
-                Discover
-              </motion.a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Dots */}
-      <div className="pointer-events-auto absolute bottom-[20%] right-[12%] z-[3] w-full text-right">
-        <div className="inline-flex items-center gap-[1.2rem] pr-[1rem]">
-          {SLIDES.map((_, idx) => (
-            <button
-              key={idx}
-              aria-label={`Go to slide ${idx + 1}`}
-              onClick={() => setI(idx)}
-              className={`h-[1.4rem] w-[1.4rem] rounded-full transition ${
-                i === idx ? "bg-[#c5a47e]" : "bg-[#c5a47e]/40"
-              }`}
+            className="relative w-full h-full"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.2, 0, 0, 1], delay: 0.1 }}
+          >
+            <video
+              ref={videoRef}
+              src={VIDEO_SRC}
+              preload="metadata"
+              playsInline
+              controls={false}
+              className="absolute inset-0 w-full h-full object-cover"
             />
-          ))}
+            {/* Controles */}
+            <Controls
+              isPlaying={isPlaying}
+              muted={muted}
+              isFS={isFS}
+              duration={duration}
+              current={current}
+              volume={volume}
+              onTogglePlay={togglePlay}
+              onSeek={handleSeek}
+              onToggleMute={toggleMute}
+              onVolume={handleVolume}
+              onToggleFS={toggleFullscreen}
+              fmt={fmt}
+            />
+          </motion.div>
         </div>
-      </div>
+      ) : (
+        // ----- Móvil / Portrait: SIN bordes; alto = solo el del video -----
+        <div
+          className="z-[1] bg-transparent"
+          style={{ marginTop: titleH }}
+        >
+          <motion.div
+            ref={containerRef}
+            className="relative mx-auto w-[100vw]" // ancho total del viewport
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.2, 0, 0, 1], delay: 0.1 }}
+          >
+            <video
+              ref={videoRef}
+              src={VIDEO_SRC}
+              preload="metadata"
+              playsInline
+              controls={false}
+              className="block w-[100vw] h-auto" // alto lo dicta el propio video
+            />
+            {/* Controles sobre el video */}
+            <Controls
+              isPlaying={isPlaying}
+              muted={muted}
+              isFS={isFS}
+              duration={duration}
+              current={current}
+              volume={volume}
+              onTogglePlay={togglePlay}
+              onSeek={handleSeek}
+              onToggleMute={toggleMute}
+              onVolume={handleVolume}
+              onToggleFS={toggleFullscreen}
+              fmt={fmt}
+              inset
+            />
+          </motion.div>
+        </div>
+      )}
     </header>
   );
 }
 
-/* Wrapper: solo el HERO */
+/* ---------- Controles compartidos ---------- */
+function Controls(props: {
+  isPlaying: boolean;
+  muted: boolean;
+  isFS: boolean;
+  duration: number;
+  current: number;
+  volume: number;
+  onTogglePlay: () => void;
+  onSeek: (n: number) => void;
+  onToggleMute: () => void;
+  onVolume: (n: number) => void;
+  onToggleFS: () => void;
+  fmt: (n: number) => string;
+  inset?: boolean;
+}) {
+  const {
+    isPlaying, muted, isFS, duration, current, volume,
+    onTogglePlay, onSeek, onToggleMute, onVolume, onToggleFS, fmt
+  } = props;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0.95, y: 8 }}
+      whileHover={{ opacity: 1, y: 0 }}
+      className="absolute left-0 right-0 bottom-0 z-[2] px-[1.5rem] pb-[1.5rem]"
+    >
+      <div className="mx-auto w-full max-w-[114rem]">
+        {/* Progreso */}
+        <div className="flex items-center gap-3">
+          <input
+            aria-label="Seek"
+            type="range"
+            min={0}
+            max={Math.max(duration, 0) || 0}
+            step={0.1}
+            value={current}
+            onChange={(e) => onSeek(parseFloat(e.target.value))}
+            className="w-full accent-[#c5a47e]"
+          />
+          <div className="text-white text-[1.3rem] tabular-nums min-w-[7ch] text-right">
+            {fmt(current)} / {fmt(duration)}
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            {/* Play/Pause */}
+            <button
+              aria-label={isPlaying ? "Pausar" : "Reproducir"}
+              onClick={onTogglePlay}
+              className="group inline-flex items-center gap-2 text-white hover:text-[#c5a47e] transition"
+            >
+              {isPlaying ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+              <span className="text-[1.4rem] hidden sm:inline">{isPlaying ? "Pausa" : "Play"}</span>
+            </button>
+
+            {/* Mute */}
+            <button
+              aria-label={muted ? "Desactivar silencio" : "Silenciar"}
+              onClick={onToggleMute}
+              className="group inline-flex items-center gap-2 text-white hover:text-[#c5a47e] transition"
+            >
+              {muted || volume === 0 ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 10v4h4l5 5V5l-5 5H5zm12.5 2l2.5 2.5-1.5 1.5L16 13.5l-2.5 2.5-1.5-1.5L14.5 12 12 9.5l1.5-1.5L16 10.5l2.5-2.5 1.5 1.5L17.5 12z"/>
+              </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 10v4h4l5 5V5l-5 5H5z"/>
+                  <path d="M16 7a5 5 0 010 10" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                </svg>
+              )}
+              <span className="text-[1.4rem] hidden sm:inline">{muted ? "Silencio" : "Sonido"}</span>
+            </button>
+
+            {/* Volumen */}
+            <input
+              aria-label="Volumen"
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={muted ? 0 : volume}
+              onChange={(e) => onVolume(parseFloat(e.target.value))}
+              className="w-[12rem] accent-[#c5a47e]"
+            />
+          </div>
+
+          {/* Fullscreen */}
+          <button
+            aria-label={isFS ? "Salir de pantalla completa" : "Pantalla completa"}
+            onClick={onToggleFS}
+            className="group inline-flex items-center gap-2 text-white hover:text-[#c5a47e] transition"
+          >
+            {isFS ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 14H5v5h5v-4H9v-1zm0-9H5v5h4V9h1V5zm10 9h-4v1h-1v4h5v-5zm-5-9v4h1v1h4V5h-5z"/>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 7H5v5h2V9h2V7zm10 0h-4v2h2v3h2V7zM7 14H5v5h5v-2H7v-3zm12 3h-3v2h5v-5h-2v3z"/>
+              </svg>
+            )}
+            <span className="text-[1.4rem] hidden sm:inline">{isFS ? "Salir" : "Full"}</span>
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* Wrapper */
 export default function SavoyeHomeSection() {
   return <SavoyeHomeHeroExact />;
 }

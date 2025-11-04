@@ -65,11 +65,11 @@ export default function SavoyeContactFooterExact() {
                   296 120 5199
                 </span>
               </div>
-              <p className="text-[#6f6f6f] text-[1.5rem] leading-[1.9] [font-family:'Roboto',_system-ui]">
+              {/* <p className="text-[#6f6f6f] text-[1.5rem] leading-[1.9] [font-family:'Roboto',_system-ui]">
                 Lunes – Viernes: 8am – 6pm
                 <br />
                 Sábado – Domingo: 9am – 3pm
-              </p>
+              </p> */}
             </div>
 
             {/* CORREO */}
@@ -92,8 +92,7 @@ export default function SavoyeContactFooterExact() {
             </div>
 
             {/* BURBUJA Ubicación — 85×85 exacto, clickeable a Google Maps */}
-            <div className="col-span-12 md:col-span-4 md:col-start-10">
-              {/* anclada al borde derecho del contenedor, y alineada verticalmente al centro de las bandas */}
+            {/* <div className="col-span-12 md:col-span-4 md:col-start-10">
               <a
                 href="https://www.google.com/maps/search/?api=1&query=Coatepec%2C%20Veracruz%2C%20M%C3%A9xico"
                 target="_blank"
@@ -103,7 +102,7 @@ export default function SavoyeContactFooterExact() {
                 title="Ver en Google Maps"
               >
                 <div className="relative w-[8.5rem] h-[8.5rem] rounded-full bg-white shadow-[0_10px_25px_rgba(0,0,0,.08)] grid place-items-center group-hover:shadow-[0_12px_28px_rgba(0,0,0,.12)] transition">
-                  {/* aro suave como en el tema */}
+                  
                   <span className="absolute inset-0 rounded-full ring-1 ring-black/5" />
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path
@@ -120,7 +119,7 @@ export default function SavoyeContactFooterExact() {
                   Nuestra ubicación
                 </div>
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

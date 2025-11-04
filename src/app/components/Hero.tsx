@@ -2,20 +2,14 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-type BreakImg = {
-  src: string;
-  /** CSS object-position, ej: "center center", "50% 30%", "left top" */
-  pos?: string;
-};
-
+type BreakImg = { src: string; pos?: string };
 type Slide = {
   title: string;
   kicker: string;
   copy: string;
   cta: string;
-  // Imagen por breakpoint + posición por breakpoint
   mobile: BreakImg;
   tablet: BreakImg;
   desktop: BreakImg;
@@ -25,7 +19,11 @@ export default function SavoyeTopExact() {
   const ACCENT = "#c5a47e";
   const BORDER = "#f6f6f6";
 
-  // Estilos de header (logo exacto)
+  // WhatsApp con +52 296 120 5199
+  const WA =
+    "https://wa.me/522961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios.";
+
+  // Header: mismo comportamiento del “correcto” (recuadro blanco visible en top)
   const NAV_TOP = {
     headerBg: "rgba(0,0,0,0)",
     logoPad: "px-[2.2rem] py-[1.4rem]",
@@ -44,34 +42,26 @@ export default function SavoyeTopExact() {
     []
   );
 
+  // Usa PNG/SVG con transparencia si quieres ver “huecos” en las letras sobre el recuadro
   const logoLight = "/imagenes/CREAR.png";
 
-  // ======= AQUÍ EDITAS TUS SLIDES (una imagen y posición por breakpoint) =======
+  // Slides
   const slides: Slide[] = [
     {
       title: "CREAR",
       kicker: "Estudio de arquitectura",
       copy: "Construyendo con sentido.",
-      cta: "#",
-      mobile: {
-        src: "/imagenes/Hero/Hero1.jpg", // móvil (≤ 767px aprox)
-        pos: "20% 10%",
-      },
-      tablet: {
-        src: "/imagenes/Hero/Hero1.jpg", // tablet (≥ 768px)
-        pos: "center center",
-      },
-      desktop: {
-        src: "/imagenes/Hero/Hero1.jpg", // desktop (≥ 1024px)
-        pos: "center 45%",
-      },
+      cta: WA,
+      mobile: { src: "/imagenes/Hero/Hero1.jpg", pos: "20% 10%" },
+      tablet: { src: "/imagenes/Hero/Hero1.jpg", pos: "center center" },
+      desktop: { src: "/imagenes/Hero/Hero1.jpg", pos: "center 45%" },
     },
     {
       title: "Diseño y construcción",
       kicker: "Servicios de",
       copy:
         "Diseño y construcción de casa-habitación, así como remodelaciones y ampliaciones de edificación habitacional, residencial y comercial.",
-      cta: "#",
+      cta: WA,
       mobile: {
         src: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/2.jpg",
         pos: "50% 30%",
@@ -90,7 +80,7 @@ export default function SavoyeTopExact() {
       kicker: "Obras de ingeniería",
       copy:
         "Trabajos de ingeniería civil y obra pública, así como obras de electrificación en alta y media tensión.",
-      cta: "#",
+      cta: WA,
       mobile: {
         src: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/3.jpg",
         pos: "center 35%",
@@ -108,7 +98,7 @@ export default function SavoyeTopExact() {
       title: "Urbanización",
       kicker: "Proyectos de",
       copy: "Proyectos de urbanización, lotificación y levantamientos de topografía.",
-      cta: "#",
+      cta: WA,
       mobile: {
         src: "https://shtheme.org/demosd/savoye/wp-content/uploads/2021/10/3.jpg",
         pos: "center 30%",
@@ -123,7 +113,6 @@ export default function SavoyeTopExact() {
       },
     },
   ];
-  // ============================================================================
 
   const services = [
     {
@@ -160,8 +149,9 @@ export default function SavoyeTopExact() {
 
   const [idx, setIdx] = useState(0);
   const [navScroll, setNavScroll] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
-  // --vh para móviles (altura real)
+  // --vh real en móviles
   useEffect(() => {
     const setVh = () => {
       const vh = window.innerHeight * 0.01;
@@ -184,11 +174,31 @@ export default function SavoyeTopExact() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Auto-rotación del carrusel
+  // Auto-rotación con reinicio
+  const clearTimer = () => {
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+  const startTimer = () => {
+    clearTimer();
+    timerRef.current = window.setInterval(
+      () => setIdx((i) => (i + 1) % slides.length),
+      7000
+    );
+  };
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 7000);
-    return () => clearInterval(t);
+    startTimer();
+    return clearTimer;
   }, [slides.length]);
+
+  const goTo = (n: number) => {
+    setIdx(n);
+    startTimer();
+  };
+  const next = () => goTo((idx + 1) % slides.length);
+  const prev = () => goTo((idx - 1 + slides.length) % slides.length);
 
   return (
     <section
@@ -201,34 +211,42 @@ export default function SavoyeTopExact() {
       ))}
       <link rel="preload" as="image" href={logoLight} />
 
-      {/* ======== HEADER SOLO CON LOGO ======== */}
+      {/* ======== HEADER (logo centrado en móvil + recuadro blanco exacto) ======== */}
       <motion.header
         initial={false}
         animate={{
           backgroundColor: navScroll ? NAV_SCROLL.headerBg : NAV_TOP.headerBg,
         }}
         transition={{ duration: 0.2 }}
-        className={`fixed top-0 left-0 right-0 z-[99] h-[10rem] flex items-center ${navScroll ? "border-b" : ""} ${navScroll ? "shadow-[0_8px_24px_rgba(0,0,0,.06)]" : ""}`}
+        className={`fixed top-0 left-0 right-0 z-[99] h-[10rem] flex items-center ${
+          navScroll ? "border-b" : ""
+        } ${navScroll ? "shadow-[0_8px_24px_rgba(0,0,0,.06)]" : ""}`}
         style={{ borderColor: navScroll ? BORDER : "transparent" }}
       >
-        <div className="mx-auto flex w-full max-w-[114rem] items-center justify-between px-[1.5rem]">
+        <div className="mx-auto flex w-full max-w-[114rem] items-center justify-center md:justify-between px-[1.5rem]">
           <a
             href="#"
-            aria-label="Savoye — home"
-            className={`relative inline-flex items-center ${navScroll ? NAV_SCROLL.logoPad : NAV_TOP.logoPad}`}
+            aria-label="CREAR — home"
+            className={`relative inline-flex items-center ${
+              navScroll ? NAV_SCROLL.logoPad : NAV_TOP.logoPad
+            }`}
           >
+            {/* Recuadro BLANCO al estilo de tu versión “correcta” */}
             <span
               aria-hidden
-              className={`pointer-events-none absolute inset-0 transition-opacity duration-150 ${navScroll ? NAV_SCROLL.cardVisible : NAV_TOP.cardVisible} bg-white shadow-[0_1rem_2.6rem_rgba(0,0,0,.14)]`}
+              className={`pointer-events-none absolute inset-0 transition-opacity duration-150 ${
+                navScroll ? NAV_SCROLL.cardVisible : NAV_TOP.cardVisible
+              } bg-white rounded-[.6rem] shadow-[0_1rem_2.6rem_rgba(0,0,0,.14)] ring-1 ring-black/10`}
             />
+            {/* Logo (más grande en móvil, normal en desktop) */}
             <img
               src={logoLight}
-              alt="Savoye"
-              className="relative h-[2.8rem] select-none"
+              alt="CREAR"
+              className="relative h-[3.6rem] md:h-[2.8rem] select-none"
               draggable={false}
             />
           </a>
-          {/* Menú eliminado a petición */}
+          {/* (sin menú) */}
         </div>
       </motion.header>
 
@@ -239,11 +257,6 @@ export default function SavoyeTopExact() {
       >
         {slides.map((s, i) => {
           const active = i === idx;
-          // Elegimos la posición por breakpoint con CSS variables para evitar CLS
-          const objectPositionVar = `
-            ${s.mobile.pos || "center center"}; 
-          `;
-
           return (
             <motion.div
               key={s.title + i}
@@ -253,7 +266,7 @@ export default function SavoyeTopExact() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ pointerEvents: active ? "auto" : "none" }}
             >
-              {/* IMAGEN RESPONSIVE POR BREAKPOINT */}
+              {/* Imagen responsive */}
               <motion.div
                 initial={false}
                 animate={{ scale: active ? 1.04 : 1.02 }}
@@ -261,19 +274,13 @@ export default function SavoyeTopExact() {
                 className="absolute inset-0 z-0"
               >
                 <picture className="absolute inset-0 block">
-                  {/* Desktop ≥ 1024px */}
                   <source media="(min-width: 1024px)" srcSet={s.desktop.src} />
-                  {/* Tablet ≥ 768px */}
                   <source media="(min-width: 768px)" srcSet={s.tablet.src} />
-                  {/* Fallback móvil */}
                   <img
                     src={s.mobile.src}
                     alt=""
                     className="absolute inset-0 h-full w-full object-cover"
-                    style={{
-                      objectPosition: "var(--obj-pos, center center)",
-                      // Actualizamos la variable en runtime con matchMedia
-                    }}
+                    style={{ objectPosition: "var(--obj-pos, center center)" }}
                   />
                 </picture>
               </motion.div>
@@ -300,16 +307,18 @@ export default function SavoyeTopExact() {
                     </p>
                     <a
                       href={s.cta}
+                      target="_blank"
+                      rel="noopener"
                       className="mt-[2rem] inline-block rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white"
                       style={{ backgroundColor: ACCENT }}
                     >
-                      Discover
+                      WhatsApp
                     </a>
                   </div>
                 </div>
               </div>
 
-              {/* Script ligero para posicionar por breakpoint sin re-render */}
+              {/* Script: object-position por breakpoint sin re-render */}
               <script
                 dangerouslySetInnerHTML={{
                   __html: `
@@ -348,7 +357,35 @@ export default function SavoyeTopExact() {
           );
         })}
 
-        {/* Bullets mobile */}
+        {/* Flechas móviles (prev/next) */}
+        <div className="absolute inset-y-0 left-0 right-0 z-50 flex items-center justify-between px-3 lg:hidden pointer-events-none">
+          <button
+            onClick={prev}
+            aria-label="Anterior"
+            className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+          >
+            ‹
+          </button>
+          <button
+            onClick={next}
+            aria-label="Siguiente"
+            className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+          >
+            ›
+          </button>
+        </div>
+
+        {/* Mensaje móvil encima de bullets */}
+        <div
+          className="absolute left-1/2 z-50 -translate-x-1/2 lg:hidden text-center"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 60px)" }}
+        >
+          <p className="px-4 text-[1.3rem] leading-tight text-white/90">
+            Explora nuestros servicios: toca los recuadros inferiores
+          </p>
+        </div>
+
+        {/* Bullets móvil */}
         <div
           className="absolute left-1/2 z-50 flex -translate-x-1/2 gap-3 lg:hidden"
           style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
@@ -358,9 +395,11 @@ export default function SavoyeTopExact() {
             return (
               <button
                 key={i}
-                onClick={() => setIdx(i)}
-                className={`h-2.5 w-2.5 rounded-full transition ${active ? "bg-white" : "border border-white/80 bg-transparent"}`}
-                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => goTo(i)}
+                className={`h-2.5 w-2.5 rounded-full transition ${
+                  active ? "bg-white" : "border border-white/80 bg-transparent"
+                }`}
+                aria-label={`Ir al slide ${i + 1}`}
               />
             );
           })}
@@ -373,11 +412,17 @@ export default function SavoyeTopExact() {
             return (
               <button
                 key={i}
-                onClick={() => setIdx(i)}
-                className={`grid h-[2.8rem] w-[2.8rem] place-items-center rounded-full border-2 ${active ? "border-white" : "border-white/65"} transition-transform duration-200 hover:scale-[1.05] ring-1 ring-white/15`}
-                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => goTo(i)}
+                className={`grid h-[2.8rem] w-[2.8rem] place-items-center rounded-full border-2 ${
+                  active ? "border-white" : "border-white/65"
+                } transition-transform duration-200 hover:scale-[1.05] ring-1 ring-white/15`}
+                aria-label={`Ir al slide ${i + 1}`}
               >
-                <span className={`h-[1rem] w-[1rem] rounded-full ${active ? "bg-white" : "bg-transparent"}`} />
+                <span
+                  className={`h-[1rem] w-[1rem] rounded-full ${
+                    active ? "bg-white" : "bg-transparent"
+                  }`}
+                />
               </button>
             );
           })}
@@ -392,8 +437,14 @@ export default function SavoyeTopExact() {
             className="grid grid-cols-1 md:grid-cols-4 border-b"
             style={{ borderColor: BORDER }}
           >
+            {/* Columna vacía */}
             <div className="hidden md:block h-[17.6rem] bg-transparent" />
-            <div className="hidden md:block h-[17.6rem] bg-transparent" />
+            {/* Mensaje en desktop (recuadro invisible a la izquierda de “Diseño Arquitectónico”) */}
+            <div className="hidden md:flex h-[17.6rem] items-center justify-center bg-white">
+              <p className="px-6 text-center text-[1.6rem] leading-snug text-[#6f6f6f]">
+                Explora nuestros servicios: utiliza los recuadros
+              </p>
+            </div>
 
             <Link
               href={services[0].href}
@@ -454,7 +505,6 @@ export default function SavoyeTopExact() {
           </div>
         </div>
 
-        {/* Separador final */}
         <div className="h-[10rem]" />
       </div>
     </section>

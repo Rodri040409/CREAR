@@ -2,16 +2,90 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
-import { type ProjectItem,PROJECTS } from "@/app/lib/projects";
+import { type ProjectItem, PROJECTS } from "@/app/lib/projects";
 
 const ACCENT = "#c5a47e";
 
-// Orden del tema original: izq = 1,4,6 / der = 2,3,5
-const LEFT: ProjectItem[]  = [PROJECTS[0], PROJECTS[3], PROJECTS[5]];
-const RIGHT: ProjectItem[] = [PROJECTS[1], PROJECTS[2], PROJECTS[4]];
+// Patrón de columnas para DESKTOP
+const PATTERN_DESKTOP: ("L" | "R")[] = ["L", "R", "R", "L", "R", "L"];
+
+/** Orden explícito por dispositivo (usa slugs). 
+ *  - Los slugs listados se colocan en ese orden.
+ *  - Los que no aparezcan se agregan al final respetando el orden original.
+ */
+const ORDER = {
+  desktop: [
+    // <<< EJEMPLO: ajusta a tu gusto >>>
+    "casa-21",
+    "pavimentacion-calle-huazontle",
+    "casa-briones-01",
+    "piscina-boca",
+    "piscina-coapexpan",
+    "rehabilitacion-oficinas",
+    "red-electrica-fracc-la-cruz",
+  ],
+  mobile: [
+    // <<< EJEMPLO móvil: primero lo que quieras destacar en phones >>>
+    "casa-21",
+    "casa-briones-01",
+    "rehabilitacion-oficinas",
+    "red-electrica-fracc-la-cruz",
+    "pavimentacion-calle-huazontle",
+    "piscina-boca",
+    "piscina-coapexpan",
+  ],
+};
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const handler = (e: MediaQueryListEvent | MediaQueryList) =>
+      setIsDesktop("matches" in e ? e.matches : (e as MediaQueryList).matches);
+    handler(mq);
+    mq.addEventListener?.("change", handler as (e: MediaQueryListEvent) => void);
+    return () => mq.removeEventListener?.("change", handler as (e: MediaQueryListEvent) => void);
+  }, []);
+  return isDesktop;
+}
+
+// Aplica un orden parcial/total basado en slugs
+function applyOrder(items: ProjectItem[], orderList: string[] | undefined) {
+  if (!orderList || orderList.length === 0) return items;
+  const pos = new Map(orderList.map((slug, i) => [slug, i]));
+  const BIG = 1e9; // envia al final lo no listado
+  return items.slice().sort(
+    (a, b) => (pos.get(a.slug) ?? BIG) - (pos.get(b.slug) ?? BIG)
+  );
+}
+
+// Divide en columnas siguiendo el patrón (solo desktop)
+function splitByPattern(items: ProjectItem[], pattern: ("L"|"R")[]) {
+  const left: ProjectItem[] = [];
+  const right: ProjectItem[] = [];
+  items.forEach((p, idx) => {
+    (pattern[idx % pattern.length] === "L" ? left : right).push(p);
+  });
+  return { left, right };
+}
 
 export default function Proyectos() {
+  const isDesktop = useIsDesktop();
+
+  // 1) Decide orden según dispositivo
+  const ordered = useMemo(() => {
+    if (isDesktop === null) return PROJECTS; // SSR: neutro
+    return applyOrder(PROJECTS, isDesktop ? ORDER.desktop : ORDER.mobile);
+  }, [isDesktop]);
+
+  // 2) Solo si es desktop, repartimos en columnas
+  const columns = useMemo(() => {
+    if (!isDesktop) return { left: [] as ProjectItem[], right: [] as ProjectItem[] };
+    return splitByPattern(ordered, PATTERN_DESKTOP);
+  }, [ordered, isDesktop]);
+
   return (
     <section id="projects" className="bg-white antialiased">
       <link
@@ -26,10 +100,10 @@ export default function Proyectos() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-[3rem]">
-          {/* Columna izquierda */}
-          <div className="md:col-span-6">
-            {LEFT.map((p) => (
+        {/* MÓVIL: una sola columna en el orden exacto de `ordered` */}
+        {isDesktop === false && (
+          <div className="space-y-[6rem]">
+            {ordered.map((p) => (
               <motion.div
                 key={p.slug}
                 initial={{ opacity: 0, y: 14 }}
@@ -41,23 +115,41 @@ export default function Proyectos() {
               </motion.div>
             ))}
           </div>
+        )}
 
-          {/* Columna derecha (con offset inicial) */}
-          <div className="md:col-span-6">
-            {RIGHT.map((p, idx) => (
-              <motion.div
-                key={p.slug}
-                className={idx === 0 ? "md:mt-[7.5rem]" : ""}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-                transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
-              >
-                <Item p={p} />
-              </motion.div>
-            ))}
+        {/* DESKTOP: dos columnas L/R con tu patrón */}
+        {isDesktop && (
+          <div className="grid grid-cols-12 md:gap-x-[3rem]">
+            <div className="col-span-6">
+              {columns.left.map((p) => (
+                <motion.div
+                  key={p.slug}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
+                  transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+                >
+                  <Item p={p} />
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="col-span-6">
+              {columns.right.map((p, idx) => (
+                <motion.div
+                  key={p.slug}
+                  className={idx === 0 ? "md:mt-[7.5rem]" : ""}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
+                  transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+                >
+                  <Item p={p} />
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

@@ -13,7 +13,7 @@ export default function SavoyeAboutExact() {
   ];
 
   const aboutImg =
-    "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/about.png";
+    "/imagenes/Nosotros/Nosotros.png";
 
   return (
     <section id="about" className="bg-white antialiased">
