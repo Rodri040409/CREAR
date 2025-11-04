@@ -8,7 +8,7 @@ export default function SavoyeContactFooterExact() {
   // /imagenes/Redes/whatsapp.avif, .webp y .png (o .jpg)
   const WA_BASE = "/imagenes/Redes/whatsapp";
   const WA =
-    "https://wa.me/2961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios.";
+    "https://wa.me/522961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios";
 
   return (
     <footer className="bg-white antialiased">

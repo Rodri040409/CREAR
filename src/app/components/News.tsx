@@ -136,6 +136,7 @@ export function SavoyeHomeHeroExact() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const lastUnmuteRef = useRef<number>(0); // ventana anti “re-mute”
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -163,7 +164,13 @@ export function SavoyeHomeHeroExact() {
     const onTime = () => setCurrent(v.currentTime || 0);
     const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
     const onPause = () => setIsPlaying(false);
-    const onVol = () => { setMuted(v.muted); setVolume(v.muted ? 0 : v.volume ?? 1); };
+    const onVol = () => {
+      const now = performance.now?.() ?? Date.now();
+      // Ignora el volumechange inmediatamente tras desmutear (Safari/Android “rebota”)
+      if (now - lastUnmuteRef.current < 350) return;
+      setMuted(v.muted);
+      setVolume(v.muted ? 0 : v.volume ?? 1);
+    };
 
     const onWebkitBeginFS = () => setIsFS(true);
     const onWebkitEndFS = () => setIsFS(false);
@@ -258,7 +265,10 @@ export function SavoyeHomeHeroExact() {
   /** track fullscreen (no-iOS) */
   useEffect(() => {
     const onFsChange = () => {
-      const fsEl = document.fullscreenElement || (document as Document).webkitFullscreenElement || null;
+      const fsEl =
+        document.fullscreenElement ||
+        (document as Document).webkitFullscreenElement ||
+        null;
       setIsFS(!!fsEl || overlayFS);
     };
     document.addEventListener("fullscreenchange", onFsChange);
@@ -274,7 +284,9 @@ export function SavoyeHomeHeroExact() {
     if (!overlayFS) return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
-    return () => { document.documentElement.style.overflow = prev; };
+    return () => {
+      document.documentElement.style.overflow = prev;
+    };
   }, [overlayFS]);
 
   /** Controles */
@@ -282,45 +294,90 @@ export function SavoyeHomeHeroExact() {
     const v = videoRef.current;
     if (!v) return;
 
-    if (v.paused) {
-      userPausedRef.current = false;
+    const unmuteWithGesture = async () => {
+      // quitar atributo y prop
+      v.removeAttribute("muted");
+      v.muted = false;
+      setMuted(false);
 
-      // 👉 Intento 1: reproducir con sonido (gesto del usuario, permitido)
+      // ventana de gracia para ignorar volumechange “fantasma”
+      lastUnmuteRef.current = performance.now?.() ?? Date.now();
+
+      // subir volumen si el navegador lo permite (en iOS puede ser ignorado)
       try {
+        v.volume = Math.max(0.8, volume || 0.8);
+      } catch (e) {
+        debugLog("volume set (gesture) failed", e);
+      }
+
+      // En iOS, bajo gesto, un micro-bump si está en 0s ayuda a “enganchar” audio
+      try {
+        if (isIOS && v.currentTime === 0) {
+          v.currentTime = 0.001;
+        }
+      } catch (e) {
+        debugLog("bump at gesture failed", e);
+      }
+
+      // ⚠️ SIEMPRE re-invoca play() tras desmutear (aunque ya estuviera reproduciendo)
+      try {
+        await v.play();
+      } catch (err) {
+        debugLog("unmute play failed", err);
+      }
+
+      // Reafirmar por si el navegador re-muteó
+      if (v.muted) {
         v.removeAttribute("muted");
         v.muted = false;
         setMuted(false);
-        // pequeño empujón SOLO en iOS y bajo gesto del usuario
-        if (isIOS && v.currentTime === 0) {
-          try { v.currentTime = 0.001; } catch (e) { /* noop */ }
+        lastUnmuteRef.current = performance.now?.() ?? Date.now();
+        try {
+          await v.play();
+        } catch (e) {
+          debugLog("re-assert play after unmute failed", e);
         }
-        await v.play();
-        return;
-      } catch (err1) {
-        debugLog("play with sound failed, retry muted", err1);
       }
+    };
 
-      // 👉 Intento 2: retry en mute (para garantizar arranque)
-      try {
-        v.setAttribute("muted", "");
-        v.muted = true;
-        setMuted(true);
-        await v.play();
+    if (!v.paused) {
+      // Ya está reproduciendo
+      if (v.muted) {
+        await unmuteWithGesture(); // 👉 primer toque: desmutea SIN pausar
         return;
-      } catch (err2) {
-        debugLog("muted play failed, try load()+play()", err2);
       }
-
-      // 👉 Intento 3: load()+play() como último recurso
-      try {
-        v.load();
-        await v.play();
-      } catch (err3) {
-        debugLog("load()+play() failed", err3);
-      }
-    } else {
+      // Si no está mute, entonces sí pausamos
       userPausedRef.current = true;
       v.pause();
+      return;
+    }
+
+    // Está pausado: intentamos empezar con sonido
+    userPausedRef.current = false;
+    try {
+      await unmuteWithGesture(); // quita mute y asegura reproducción con audio
+      return;
+    } catch (err1) {
+      debugLog("play with sound failed", err1);
+    }
+
+    // Fallback: reproducir en mute
+    try {
+      v.setAttribute("muted", "");
+      v.muted = true;
+      setMuted(true);
+      await v.play();
+      return;
+    } catch (err2) {
+      debugLog("muted play failed, trying load()+play()", err2);
+    }
+
+    // Último recurso: recargar y reproducir
+    try {
+      v.load();
+      await v.play();
+    } catch (err3) {
+      debugLog("load()+play() failed", err3);
     }
   };
 
@@ -335,12 +392,17 @@ export function SavoyeHomeHeroExact() {
     const v = videoRef.current;
     if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
-    try { v.volume = vol; } catch (err) { debugLog("volume set failed", err); }
+    try {
+      v.volume = vol;
+    } catch (err) {
+      debugLog("volume set failed", err);
+    }
     setVolume(vol);
     if (vol > 0 && muted) {
       v.muted = false;
       setMuted(false);
       v.removeAttribute("muted");
+      lastUnmuteRef.current = performance.now?.() ?? Date.now();
     }
   };
   const toggleMute = () => {
@@ -348,13 +410,27 @@ export function SavoyeHomeHeroExact() {
     if (!v) return;
     v.muted = !v.muted;
     setMuted(v.muted);
-    if (v.muted) v.setAttribute("muted", ""); else v.removeAttribute("muted");
+    if (v.muted) {
+      v.setAttribute("muted", "");
+    } else {
+      v.removeAttribute("muted");
+      lastUnmuteRef.current = performance.now?.() ?? Date.now();
+      try {
+        v.volume = Math.max(0.8, volume || 0.8);
+      } catch (err) {
+        debugLog("volume set after toggle failed", err);
+      }
+    }
   };
 
   const enterOverlay = () => {
     const v = videoRef.current;
     if (v && v.paused && !userPausedRef.current) {
-      try { void v.play(); } catch (err) { debugLog("overlay play failed", err); }
+      try {
+        void v.play();
+      } catch (err) {
+        debugLog("overlay play failed", err);
+      }
     }
     setOverlayFS(true);
     setIsFS(true);
@@ -386,19 +462,13 @@ export function SavoyeHomeHeroExact() {
       webkitExitFullscreen?: () => Promise<void> | void;
     };
 
-    const req =
-      v.requestFullscreen?.bind(v) ||
-      v.webkitRequestFullscreen?.bind(v);
-
-    const exit =
-      doc.exitFullscreen?.bind(doc) ||
-      doc.webkitExitFullscreen?.bind(doc);
-
+    const req = v.requestFullscreen?.bind(v) || v.webkitRequestFullscreen?.bind(v);
+    const exit = doc.exitFullscreen?.bind(doc) || doc.webkitExitFullscreen?.bind(doc);
     const isDocFS = doc.fullscreenElement ?? doc.webkitFullscreenElement;
 
     if (!isDocFS) {
       try {
-        await (req?.());
+        await req?.();
         await tryLockLandscape();
       } catch (err) {
         debugLog("Fullscreen API failed, fallback overlay", err);
@@ -407,7 +477,7 @@ export function SavoyeHomeHeroExact() {
     } else {
       await tryUnlockOrientation();
       try {
-        await (exit?.());
+        await exit?.();
       } catch (err) {
         debugLog("exit fullscreen failed", err);
       }
@@ -585,11 +655,8 @@ function Controls(props: {
   inset?: boolean;
   showVolume?: boolean;
 }) {
-  const {
-    isPlaying, muted, isFS, duration, current, volume,
-    onTogglePlay, onSeek, onToggleMute, onVolume, onToggleFS, fmt,
-    showVolume = true,
-  } = props;
+  const { isPlaying, muted, isFS, duration, current, volume, onTogglePlay, onSeek, onToggleMute, onVolume, onToggleFS, fmt, showVolume = true } =
+    props;
 
   return (
     <motion.div

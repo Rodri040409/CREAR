@@ -20,7 +20,7 @@ export default function SavoyeTopExact() {
   const BORDER = "#f6f6f6";
 
   const WA =
-    "https://wa.me/2961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios.";
+    "https://wa.me/522961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios";
 
   const NAV_TOP = {
     headerBg: "rgba(0,0,0,0)",
