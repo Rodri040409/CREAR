@@ -11,8 +11,8 @@ function buildVideoSources(originalPath: string) {
   const base = originalPath.replace(/\.(mp4|webm|ogg|ogv|m4v)$/i, "");
   return {
     webm: `${base}.webm`,
-    mp4:  `${base}.mp4`,
-    ogg:  `${base}.ogg`,
+    mp4: `${base}.mp4`,
+    ogg: `${base}.ogg`,
   };
 }
 const sources = buildVideoSources(VIDEO_SRC);
@@ -20,13 +20,17 @@ const sources = buildVideoSources(VIDEO_SRC);
 /* ===== utilidades que miden SOLO al montar ===== */
 function useInitialVH() {
   const [vh, setVh] = useState<number>(() => 720);
-  useEffect(() => { setVh(window.innerHeight || 720); }, []);
+  useEffect(() => {
+    setVh(window.innerHeight || 720);
+  }, []);
   return vh;
 }
 function useInitialElHeight<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [h, setH] = useState<number>(90);
-  useEffect(() => { if (ref.current) setH(ref.current.offsetHeight || 90); }, []);
+  useEffect(() => {
+    if (ref.current) setH(ref.current.offsetHeight || 90);
+  }, []);
   return { ref, h };
 }
 /* detectar orientación (solo reacciona cuando ROTA, no por resize fino) */
@@ -34,11 +38,10 @@ function useOrientation() {
   const [portrait, setPortrait] = useState<boolean | null>(null);
   useEffect(() => {
     const mq = window.matchMedia("(orientation: portrait)");
-    const set = (e: MediaQueryList | MediaQueryListEvent) =>
-      setPortrait("matches" in e ? e.matches : (e as MediaQueryList).matches);
-    set(mq);
-    mq.addEventListener?.("change", set as (e: MediaQueryListEvent) => void);
-    return () => mq.removeEventListener?.("change", set as (e: MediaQueryListEvent) => void);
+    const handler = (e: MediaQueryListEvent) => setPortrait(e.matches);
+    setPortrait(mq.matches);
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
   }, []);
   return portrait;
 }
@@ -77,7 +80,10 @@ export function SavoyeHomeHeroExact() {
     if (!v) return;
     const onLoaded = () => setDuration(v.duration || 0);
     const onTime = () => setCurrent(v.currentTime || 0);
-    const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
+    const onPlay = () => {
+      setIsPlaying(true);
+      userPausedRef.current = false;
+    };
     const onPause = () => setIsPlaying(false);
     v.addEventListener("loadedmetadata", onLoaded);
     v.addEventListener("timeupdate", onTime);
@@ -102,7 +108,7 @@ export function SavoyeHomeHeroExact() {
         if (!e) return;
         const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
         if (visible) {
-          if (!userPausedRef.current) v.play().catch(() => {});
+          if (!userPausedRef.current) v.play().catch((err) => { void err; });
         } else {
           v.pause();
         }
@@ -118,50 +124,72 @@ export function SavoyeHomeHeroExact() {
     const onFsChange = () => {
       const fsEl =
         document.fullscreenElement ||
-        // @ts-ignore
-        document.webkitFullscreenElement ||
+        (document as any).webkitFullscreenElement ||
         null;
       setIsFS(!!fsEl);
     };
     document.addEventListener("fullscreenchange", onFsChange);
-    // @ts-ignore
-    document.addEventListener("webkitfullscreenchange", onFsChange);
+    (document as any).addEventListener?.("webkitfullscreenchange", onFsChange);
     return () => {
       document.removeEventListener("fullscreenchange", onFsChange);
-      // @ts-ignore
-      document.removeEventListener("webkitfullscreenchange", onFsChange);
+      (document as any).removeEventListener?.("webkitfullscreenchange", onFsChange);
     };
   }, []);
 
   // Acciones
   const togglePlay = () => {
-    const v = videoRef.current; if (!v) return;
-    if (v.paused) { userPausedRef.current = false; v.play().catch(() => {}); }
-    else { userPausedRef.current = true; v.pause(); }
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      userPausedRef.current = false;
+      v.play().catch((err) => { void err; });
+    } else {
+      userPausedRef.current = true;
+      v.pause();
+    }
   };
   const handleSeek = (val: number) => {
-    const v = videoRef.current; if (!v) return;
+    const v = videoRef.current;
+    if (!v) return;
     const t = Math.min(Math.max(val, 0), duration || 0);
-    v.currentTime = t; setCurrent(t);
+    v.currentTime = t;
+    setCurrent(t);
   };
   const handleVolume = (val: number) => {
-    const v = videoRef.current; if (!v) return;
+    const v = videoRef.current;
+    if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
-    v.volume = vol; setVolume(vol);
-    if (vol > 0 && muted) { v.muted = false; setMuted(false); }
+    v.volume = vol;
+    setVolume(vol);
+    if (vol > 0 && muted) {
+      v.muted = false;
+      setMuted(false);
+    }
   };
   const toggleMute = () => {
-    const v = videoRef.current; if (!v) return;
-    v.muted = !v.muted; setMuted(v.muted);
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
   };
   const toggleFullscreen = () => {
-    const c = containerRef.current; if (!c) return;
-    // @ts-ignore
-    (!isFS ? (c.requestFullscreen || c.webkitRequestFullscreen) : (document.exitFullscreen || document.webkitExitFullscreen))?.call(!isFS ? c : document);
+    const c = containerRef.current;
+    if (!c) return;
+    const req: undefined | (() => Promise<void>) =
+      c.requestFullscreen || (c as any).webkitRequestFullscreen;
+    const exit: undefined | (() => Promise<void>) =
+      document.exitFullscreen || (document as any).webkitExitFullscreen;
+
+    if (!isFS) {
+      req?.call(c);
+    } else {
+      exit?.call(document);
+    }
   };
   const fmt = (s: number) => {
     if (!isFinite(s)) return "0:00";
-    const m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    const m = Math.floor(s / 60),
+      ss = Math.floor(s % 60);
     return `${m}:${ss.toString().padStart(2, "0")}`;
   };
 
@@ -212,8 +240,8 @@ export function SavoyeHomeHeroExact() {
               className="absolute inset-0 w-full h-full object-cover"
             >
               <source src={sources.webm} type="video/webm" />
-              <source src={sources.mp4}  type="video/mp4" />
-              <source src={sources.ogg}  type="video/ogg" />
+              <source src={sources.mp4} type="video/mp4" />
+              <source src={sources.ogg} type="video/ogg" />
               Tu navegador no soporta el elemento de video.
             </video>
 
@@ -251,8 +279,8 @@ export function SavoyeHomeHeroExact() {
               className="block w-[100vw] h-auto"
             >
               <source src={sources.webm} type="video/webm" />
-              <source src={sources.mp4}  type="video/mp4" />
-              <source src={sources.ogg}  type="video/ogg" />
+              <source src={sources.mp4} type="video/mp4" />
+              <source src={sources.ogg} type="video/ogg" />
               Tu navegador no soporta el elemento de video.
             </video>
 
@@ -295,8 +323,18 @@ function Controls(props: {
   inset?: boolean;
 }) {
   const {
-    isPlaying, muted, isFS, duration, current, volume,
-    onTogglePlay, onSeek, onToggleMute, onVolume, onToggleFS, fmt
+    isPlaying,
+    muted,
+    isFS,
+    duration,
+    current,
+    volume,
+    onTogglePlay,
+    onSeek,
+    onToggleMute,
+    onVolume,
+    onToggleFS,
+    fmt,
   } = props;
 
   return (
@@ -353,12 +391,12 @@ function Controls(props: {
             >
               {muted || volume === 0 ? (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M5 10v4h4l5 5V5l-5 5H5zm12.5 2l2.5 2.5-1.5 1.5L16 13.5l-2.5 2.5-1.5-1.5L14.5 12 12 9.5l1.5-1.5L16 10.5l2.5-2.5 1.5 1.5L17.5 12z"/>
+                  <path d="M5 10v4h4l5 5V5l-5 5H5zm12.5 2l2.5 2.5-1.5 1.5L16 13.5l-2.5 2.5-1.5-1.5L14.5 12 12 9.5l1.5-1.5L16 10.5l2.5-2.5 1.5 1.5L17.5 12z" />
                 </svg>
               ) : (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M5 10v4h4l5 5V5l-5 5H5z"/>
-                  <path d="M16 7a5 5 0 010 10" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M5 10v4h4l5 5V5l-5 5H5z" />
+                  <path d="M16 7a5 5 0 010 10" stroke="currentColor" strokeWidth="1.5" fill="none" />
                 </svg>
               )}
               <span className="text-[1.4rem] hidden sm:inline">{muted ? "Silencio" : "Sonido"}</span>
@@ -385,11 +423,11 @@ function Controls(props: {
           >
             {isFS ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 14H5v5h5v-4H9v-1zm0-9H5v5h4V9h1V5zm10 9h-4v1h-1v4h5v-5zm-5-9v4h1v1h4V5h-5z"/>
+                <path d="M9 14H5v5h5v-4H9v-1zm0-9H5v5h4V9h1V5zm10 9h-4v1h-1v4h5v-5zm-5-9v4h1v1h4V5h-5z" />
               </svg>
             ) : (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 7H5v5h2V9h2V7zm10 0h-4v2h2v3h2V7zM7 14H5v5h5v-2H7v-3zm12 3h-3v2h5v-5h-2v3z"/>
+                <path d="M9 7H5v5h2V9h2V7zm10 0h-4v2h2v3h2V7zM7 14H5v5h5v-2H7v-3zm12 3h-3v2h5v-5h-2v3z" />
               </svg>
             )}
             <span className="text-[1.4rem] hidden sm:inline">{isFS ? "Salir" : "Full"}</span>
