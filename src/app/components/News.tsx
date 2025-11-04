@@ -1,4 +1,3 @@
-// src/app/components/News.tsx
 "use client";
 
 /* eslint-disable @next/next/no-page-custom-font */
@@ -9,14 +8,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const TITLE = "Proyecto Casa Diamante, Boca del Rio";
 const VIDEO_SRC = "/videos/NewsVideo.mp4";
 
-/* ==== Fuentes alternativas del mismo nombre base ==== */
 function buildVideoSources(originalPath: string) {
   const base = originalPath.replace(/\.(mp4|webm|ogg|ogv|m4v)$/i, "");
   return { webm: `${base}.webm`, mp4: `${base}.mp4`, ogg: `${base}.ogg` };
 }
 const sources = buildVideoSources(VIDEO_SRC);
 
-/* ===== helpers responsivos ===== */
 function useViewportHeight() {
   const [vh, setVh] = useState<number>(720);
   useEffect(() => {
@@ -78,7 +75,7 @@ export function SavoyeHomeHeroExact() {
   const vh = useViewportHeight();
   const { ref: titleRef, h: titleH } = useInitialElHeight<HTMLDivElement>();
   const isPortrait = useOrientation();
-  const hasFinePointer = useFinePointer(); // desktop ≈ true
+  const hasFinePointer = useFinePointer();
   const isIOS = useIOS();
 
   const fonts = useMemo(
@@ -95,17 +92,15 @@ export function SavoyeHomeHeroExact() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Estado controles
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [current, setCurrent] = useState(0);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
-  const [isFS, setIsFS] = useState(false);           // fullscreen activo (API u overlay)
-  const [overlayFS, setOverlayFS] = useState(false); // fullscreen CSS (iOS/mobile)
+  const [isFS, setIsFS] = useState(false);
+  const [overlayFS, setOverlayFS] = useState(false);
   const userPausedRef = useRef(false);
 
-  // Eventos video + sincronizar con cambios externos (hardware, SO)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -128,7 +123,6 @@ export function SavoyeHomeHeroExact() {
     };
   }, []);
 
-  // Play/pause según visibilidad del hero (ignora cuando está en fullscreen)
   useEffect(() => {
     const el = sectionRef.current;
     const v = videoRef.current;
@@ -140,7 +134,7 @@ export function SavoyeHomeHeroExact() {
         if (!e) return;
         const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
         if (visible) {
-          if (!userPausedRef.current) v.play().catch(() => {});
+          if (!userPausedRef.current) v.play().catch(() => { return; });
         } else {
           v.pause();
         }
@@ -151,7 +145,6 @@ export function SavoyeHomeHeroExact() {
     return () => io.disconnect();
   }, [isFS, overlayFS]);
 
-  // Fullscreen API (desktop/android) + reflejar overlay
   useEffect(() => {
     const onFsChange = () => {
       const fsEl =
@@ -168,7 +161,6 @@ export function SavoyeHomeHeroExact() {
     };
   }, [overlayFS]);
 
-  // Bloquear scroll del body cuando el overlay está activo
   useEffect(() => {
     if (!overlayFS) return;
     const prev = document.documentElement.style.overflow;
@@ -176,13 +168,12 @@ export function SavoyeHomeHeroExact() {
     return () => { document.documentElement.style.overflow = prev; };
   }, [overlayFS]);
 
-  // Acciones
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
       userPausedRef.current = false;
-      v.play().catch(() => {});
+      v.play().catch(() => { return; });
     } else {
       userPausedRef.current = true;
       v.pause();
@@ -199,8 +190,7 @@ export function SavoyeHomeHeroExact() {
     const v = videoRef.current;
     if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
-    // iOS ignora volume; igual reflejamos en UI
-    v.volume = vol;
+    v.volume = vol;            // iOS puede ignorarlo; igual sincronizamos UI
     setVolume(vol);
     if (vol > 0 && muted) {
       v.muted = false;
@@ -216,9 +206,8 @@ export function SavoyeHomeHeroExact() {
 
   const enterOverlay = () => {
     const v = videoRef.current;
-    // reproducir dentro del MISMO gesto del usuario (iOS policy)
     if (v && v.paused && !userPausedRef.current) {
-      try { void v.play(); } catch {}
+      try { void v.play(); } catch (_e) { return; }
     }
     setOverlayFS(true);
     setIsFS(true);
@@ -229,25 +218,27 @@ export function SavoyeHomeHeroExact() {
   };
 
   const toggleFullscreen = () => {
-    // iOS ⇒ usar overlay CSS con controles nativos
     if (isIOS) {
       overlayFS ? exitOverlay() : enterOverlay();
       return;
     }
     const c = containerRef.current || videoRef.current;
     if (!c) return;
-    const req: undefined | (() => Promise<void>) =
-      (c as any).requestFullscreen || (c as any).webkitRequestFullscreen;
-    const exit: undefined | (() => Promise<void>) =
-      (document as any).exitFullscreen || (document as any).webkitExitFullscreen;
 
-    const isDocFS =
-      document.fullscreenElement || (document as any).webkitFullscreenElement;
+    type RSEl = Element & { webkitRequestFullscreen?: () => Promise<void> };
+    type FSDoc = Document & { webkitExitFullscreen?: () => Promise<void>; webkitFullscreenElement?: Element | null };
 
+    const el = c as RSEl;
+    const doc = document as FSDoc;
+
+    const req = el.requestFullscreen?.bind(el) ?? el.webkitRequestFullscreen?.bind(el);
+    const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+
+    const isDocFS = doc.fullscreenElement ?? doc.webkitFullscreenElement;
     if (!isDocFS) {
-      req?.call(c);
+      req?.();
     } else {
-      exit?.call(document);
+      exit?.();
     }
   };
 
@@ -259,7 +250,7 @@ export function SavoyeHomeHeroExact() {
   };
 
   const portrait = isPortrait === true;
-  const showVolume = hasFinePointer && !isIOS; // ocultar en móviles/iOS
+  const showVolume = hasFinePointer && !isIOS;
   const overlayClass =
     overlayFS ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0" : "";
 
@@ -271,7 +262,6 @@ export function SavoyeHomeHeroExact() {
     >
       {fonts}
 
-      {/* Título fijo arriba */}
       <motion.div
         ref={titleRef}
         initial={{ opacity: 0, y: -12 }}
@@ -286,9 +276,7 @@ export function SavoyeHomeHeroExact() {
         </div>
       </motion.div>
 
-      {/* ====== VIDEO AREA ====== */}
       {!portrait ? (
-        // Desktop / Landscape
         <div
           ref={containerRef}
           className={`absolute left-0 right-0 bottom-0 z-[1] bg-black ${overlayClass}`}
@@ -304,7 +292,6 @@ export function SavoyeHomeHeroExact() {
               ref={videoRef}
               preload="metadata"
               playsInline
-              // En overlay dejamos los controles nativos para iOS/Android
               controls={overlayFS}
               muted={muted}
               className={`absolute inset-0 w-full h-full ${overlayFS ? "object-contain" : "object-cover"}`}
@@ -315,7 +302,6 @@ export function SavoyeHomeHeroExact() {
               Tu navegador no soporta el elemento de video.
             </video>
 
-            {/* Botón cerrar overlay (visible solo en overlay) */}
             {overlayFS && (
               <button
                 onClick={exitOverlay}
@@ -344,7 +330,6 @@ export function SavoyeHomeHeroExact() {
           </motion.div>
         </div>
       ) : (
-        // Móvil / Portrait
         <div className={`z-[1] bg-transparent ${overlayClass}`} style={{ marginTop: overlayFS ? 0 : titleH }}>
           <motion.div
             ref={containerRef}
@@ -400,7 +385,6 @@ export function SavoyeHomeHeroExact() {
   );
 }
 
-/* ---------- Controles compartidos ---------- */
 function Controls(props: {
   isPlaying: boolean;
   muted: boolean;
@@ -430,7 +414,6 @@ function Controls(props: {
       className="absolute left-0 right-0 bottom-0 z-[65] px-[1.5rem] pb-[1.5rem]"
     >
       <div className="mx-auto w-full max-w-[114rem]">
-        {/* Progreso */}
         <div className="flex items-center gap-3">
           <input
             aria-label="Seek"
@@ -447,10 +430,8 @@ function Controls(props: {
           </div>
         </div>
 
-        {/* Botones */}
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            {/* Play/Pause */}
             <button
               aria-label={isPlaying ? "Pausar" : "Reproducir"}
               onClick={onTogglePlay}
@@ -469,7 +450,6 @@ function Controls(props: {
               <span className="text-[1.4rem] hidden sm:inline">{isPlaying ? "Pausa" : "Play"}</span>
             </button>
 
-            {/* Mute */}
             <button
               aria-label={muted ? "Desactivar silencio" : "Silenciar"}
               onClick={onToggleMute}
@@ -488,7 +468,6 @@ function Controls(props: {
               <span className="text-[1.4rem] hidden sm:inline">{muted ? "Silencio" : "Sonido"}</span>
             </button>
 
-            {/* Volumen (solo desktop) */}
             {showVolume && (
               <input
                 aria-label="Volumen"
@@ -503,7 +482,6 @@ function Controls(props: {
             )}
           </div>
 
-          {/* Fullscreen */}
           <button
             aria-label={isFS ? "Salir de pantalla completa" : "Pantalla completa"}
             onClick={onToggleFS}
@@ -526,7 +504,6 @@ function Controls(props: {
   );
 }
 
-/* Wrapper */
 export default function SavoyeHomeSection() {
   return <SavoyeHomeHeroExact />;
 }
