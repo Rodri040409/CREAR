@@ -1,9 +1,24 @@
 "use client";
 
 /* eslint-disable @next/next/no-page-custom-font */
-
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+/** ---------- Tipos WebKit/Fullscreen y prefijos ---------- */
+declare global {
+  interface Document {
+    webkitFullscreenElement?: Element | null;
+    webkitExitFullscreen?: () => Promise<void> | void;
+  }
+  interface Element {
+    webkitRequestFullscreen?: () => Promise<void> | void;
+  }
+  interface HTMLVideoElement {
+    webkitEnterFullscreen?: () => void;
+    webkitExitFullscreen?: () => void;
+    webkitPresentationMode?: "inline" | "picture-in-picture" | "fullscreen";
+  }
+}
 
 const TITLE = "Proyecto Casa Diamante, Boca del Rio";
 const VIDEO_SRC = "/videos/NewsVideo.mp4";
@@ -14,6 +29,35 @@ function buildVideoSources(originalPath: string) {
 }
 const sources = buildVideoSources(VIDEO_SRC);
 
+/** --------- Utils (sin catches vacíos, SSR-safe) ---------- */
+function debugLog(...args: unknown[]) {
+  if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.debug("[video]", ...args);
+  }
+}
+async function tryLockLandscape() {
+  try {
+    const so: any = (screen as any)?.orientation;
+    if (so && typeof so.lock === "function") {
+      await so.lock("landscape");
+    }
+  } catch (err) {
+    debugLog("orientation lock not supported", err);
+  }
+}
+async function tryUnlockOrientation() {
+  try {
+    const so: any = (screen as any)?.orientation;
+    if (so && typeof so.unlock === "function") {
+      await so.unlock();
+    }
+  } catch (err) {
+    debugLog("orientation unlock not supported", err);
+  }
+}
+
+/** ---------------- Hooks ---------------- */
 function useViewportHeight() {
   const [vh, setVh] = useState<number>(720);
   useEffect(() => {
@@ -71,6 +115,7 @@ function useIOS() {
   return ios;
 }
 
+/** ---------------- Componente ---------------- */
 export function SavoyeHomeHeroExact() {
   const vh = useViewportHeight();
   const { ref: titleRef, h: titleH } = useInitialElHeight<HTMLDivElement>();
@@ -96,33 +141,64 @@ export function SavoyeHomeHeroExact() {
   const [duration, setDuration] = useState(0);
   const [current, setCurrent] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true); // muted para autoplay
   const [isFS, setIsFS] = useState(false);
   const [overlayFS, setOverlayFS] = useState(false);
   const userPausedRef = useRef(false);
 
+  /** Eventos del <video> + compat */
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const onLoaded = () => setDuration(v.duration || 0);
+
+    const onLoadedMeta = () => setDuration(v.duration || 0);
+    const onLoadedData = () => {
+      try {
+        if (v.currentTime === 0) v.currentTime = 0.001; // evita “pantalla blanca”
+      } catch (err) {
+        debugLog("bump first frame failed", err);
+      }
+    };
     const onTime = () => setCurrent(v.currentTime || 0);
     const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
     const onPause = () => setIsPlaying(false);
     const onVol = () => { setMuted(v.muted); setVolume(v.muted ? 0 : v.volume ?? 1); };
-    v.addEventListener("loadedmetadata", onLoaded);
+
+    // Handlers WebKit que NECESITAMOS reusar en cleanup
+    const onWebkitBeginFS = () => setIsFS(true);
+    const onWebkitEndFS = () => setIsFS(false);
+
+    v.addEventListener("loadedmetadata", onLoadedMeta);
+    v.addEventListener("loadeddata", onLoadedData);
     v.addEventListener("timeupdate", onTime);
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     v.addEventListener("volumechange", onVol);
+    (v as any).addEventListener?.("webkitbeginfullscreen", onWebkitBeginFS);
+    (v as any).addEventListener?.("webkitendfullscreen", onWebkitEndFS);
+
+    // controlesList / PiP vía atributos + prop (máxima compatibilidad)
+    try {
+      v.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback");
+      (v as any).disablePictureInPicture = true;
+      v.setAttribute("disablePictureInPicture", "");
+    } catch (err) {
+      debugLog("controlsList/PiP flags ignored", err);
+    }
+
     return () => {
-      v.removeEventListener("loadedmetadata", onLoaded);
+      v.removeEventListener("loadedmetadata", onLoadedMeta);
+      v.removeEventListener("loadeddata", onLoadedData);
       v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("volumechange", onVol);
+      (v as any).removeEventListener?.("webkitbeginfullscreen", onWebkitBeginFS);
+      (v as any).removeEventListener?.("webkitendfullscreen", onWebkitEndFS);
     };
   }, []);
 
+  /** autoplay cuando visible (pausa al salir) si no está en FS */
   useEffect(() => {
     const el = sectionRef.current;
     const v = videoRef.current;
@@ -134,7 +210,9 @@ export function SavoyeHomeHeroExact() {
         if (!e) return;
         const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
         if (visible) {
-          if (!userPausedRef.current) v.play().catch(() => { return; });
+          if (!userPausedRef.current) {
+            void v.play().catch((err) => debugLog("autoplay blocked", err));
+          }
         } else {
           v.pause();
         }
@@ -145,12 +223,10 @@ export function SavoyeHomeHeroExact() {
     return () => io.disconnect();
   }, [isFS, overlayFS]);
 
+  /** track fullscreen (no-iOS) */
   useEffect(() => {
     const onFsChange = () => {
-      const fsEl =
-        document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        null;
+      const fsEl = document.fullscreenElement || (document as Document).webkitFullscreenElement || null;
       setIsFS(!!fsEl || overlayFS);
     };
     document.addEventListener("fullscreenchange", onFsChange);
@@ -161,6 +237,7 @@ export function SavoyeHomeHeroExact() {
     };
   }, [overlayFS]);
 
+  /** bloquear scroll SOLO si usamos el overlay fallback */
   useEffect(() => {
     if (!overlayFS) return;
     const prev = document.documentElement.style.overflow;
@@ -168,12 +245,13 @@ export function SavoyeHomeHeroExact() {
     return () => { document.documentElement.style.overflow = prev; };
   }, [overlayFS]);
 
+  /** Controles */
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
       userPausedRef.current = false;
-      v.play().catch(() => { return; });
+      void v.play().catch((err) => debugLog("play failed", err));
     } else {
       userPausedRef.current = true;
       v.pause();
@@ -190,7 +268,7 @@ export function SavoyeHomeHeroExact() {
     const v = videoRef.current;
     if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
-    v.volume = vol;            // iOS puede ignorarlo; igual sincronizamos UI
+    try { v.volume = vol; } catch (err) { debugLog("volume set failed", err); }
     setVolume(vol);
     if (vol > 0 && muted) {
       v.muted = false;
@@ -207,7 +285,7 @@ export function SavoyeHomeHeroExact() {
   const enterOverlay = () => {
     const v = videoRef.current;
     if (v && v.paused && !userPausedRef.current) {
-      try { void v.play(); } catch (_e) { return; }
+      try { void v.play(); } catch (err) { debugLog("overlay play failed", err); }
     }
     setOverlayFS(true);
     setIsFS(true);
@@ -217,28 +295,53 @@ export function SavoyeHomeHeroExact() {
     setIsFS(false);
   };
 
-  const toggleFullscreen = () => {
-    if (isIOS) {
-      overlayFS ? exitOverlay() : enterOverlay();
-      return;
+  const toggleFullscreen = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    // iOS Safari: fullscreen NATIVO
+    if (isIOS && v.webkitEnterFullscreen) {
+      try {
+        v.webkitEnterFullscreen();
+        return;
+      } catch (err) {
+        debugLog("iOS webkitEnterFullscreen failed", err);
+        enterOverlay();
+        return;
+      }
     }
-    const c = containerRef.current || videoRef.current;
-    if (!c) return;
 
-    type RSEl = Element & { webkitRequestFullscreen?: () => Promise<void> };
-    type FSDoc = Document & { webkitExitFullscreen?: () => Promise<void>; webkitFullscreenElement?: Element | null };
+    // Resto: Fullscreen API sobre el <video>
+    const doc = document as Document & {
+      webkitFullscreenElement?: Element | null;
+      webkitExitFullscreen?: () => Promise<void> | void;
+    };
 
-    const el = c as RSEl;
-    const doc = document as FSDoc;
+    const req =
+      v.requestFullscreen?.bind(v) ||
+      v.webkitRequestFullscreen?.bind(v);
 
-    const req = el.requestFullscreen?.bind(el) ?? el.webkitRequestFullscreen?.bind(el);
-    const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+    const exit =
+      doc.exitFullscreen?.bind(doc) ||
+      doc.webkitExitFullscreen?.bind(doc);
 
     const isDocFS = doc.fullscreenElement ?? doc.webkitFullscreenElement;
+
     if (!isDocFS) {
-      req?.();
+      try {
+        await (req?.());
+        await tryLockLandscape();
+      } catch (err) {
+        debugLog("Fullscreen API failed, fallback overlay", err);
+        enterOverlay();
+      }
     } else {
-      exit?.();
+      await tryUnlockOrientation();
+      try {
+        await (exit?.());
+      } catch (err) {
+        debugLog("exit fullscreen failed", err);
+      }
     }
   };
 
@@ -252,7 +355,7 @@ export function SavoyeHomeHeroExact() {
   const portrait = isPortrait === true;
   const showVolume = hasFinePointer && !isIOS;
   const overlayClass =
-    overlayFS ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0" : "";
+    overlayFS ? "fixed inset-0 z-[9999] bg-black w-[100svw] h-[100svh] m-0" : "";
 
   return (
     <header
@@ -276,6 +379,7 @@ export function SavoyeHomeHeroExact() {
         </div>
       </motion.div>
 
+      {/* Landscape */}
       {!portrait ? (
         <div
           ref={containerRef}
@@ -290,11 +394,14 @@ export function SavoyeHomeHeroExact() {
           >
             <video
               ref={videoRef}
-              preload="metadata"
+              preload="auto"
               playsInline
-              controls={overlayFS}
+              autoPlay
               muted={muted}
-              className={`absolute inset-0 w-full h-full ${overlayFS ? "object-contain" : "object-cover"}`}
+              controls={isIOS && isFS} /* iOS: controles nativos en FS */
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ backgroundColor: "#000" }}
+              onClick={togglePlay}
             >
               <source src={sources.webm} type="video/webm" />
               <source src={sources.mp4} type="video/mp4" />
@@ -312,24 +419,28 @@ export function SavoyeHomeHeroExact() {
               </button>
             )}
 
-            <Controls
-              isPlaying={isPlaying}
-              muted={muted}
-              isFS={isFS}
-              duration={duration}
-              current={current}
-              volume={volume}
-              onTogglePlay={togglePlay}
-              onSeek={handleSeek}
-              onToggleMute={toggleMute}
-              onVolume={handleVolume}
-              onToggleFS={toggleFullscreen}
-              fmt={fmt}
-              showVolume={showVolume}
-            />
+            {/* Oculta controles propios en FS nativo */}
+            {(!isFS || overlayFS) && (
+              <Controls
+                isPlaying={isPlaying}
+                muted={muted}
+                isFS={isFS}
+                duration={duration}
+                current={current}
+                volume={volume}
+                onTogglePlay={togglePlay}
+                onSeek={handleSeek}
+                onToggleMute={toggleMute}
+                onVolume={handleVolume}
+                onToggleFS={toggleFullscreen}
+                fmt={fmt}
+                showVolume={showVolume}
+              />
+            )}
           </motion.div>
         </div>
       ) : (
+        // Portrait
         <div className={`z-[1] bg-transparent ${overlayClass}`} style={{ marginTop: overlayFS ? 0 : titleH }}>
           <motion.div
             ref={containerRef}
@@ -340,11 +451,14 @@ export function SavoyeHomeHeroExact() {
           >
             <video
               ref={videoRef}
-              preload="metadata"
+              preload="auto"
               playsInline
-              controls={overlayFS}
+              autoPlay
               muted={muted}
-              className={overlayFS ? "block w-full h-full object-contain" : "block w-[100vw] h-auto"}
+              controls={isIOS && isFS}
+              className={overlayFS ? "block w-full h-full object-cover" : "block w-[100vw] h-auto"}
+              style={{ backgroundColor: "#000" }}
+              onClick={togglePlay}
             >
               <source src={sources.webm} type="video/webm" />
               <source src={sources.mp4} type="video/mp4" />
@@ -362,22 +476,23 @@ export function SavoyeHomeHeroExact() {
               </button>
             )}
 
-            <Controls
-              isPlaying={isPlaying}
-              muted={muted}
-              isFS={isFS}
-              duration={duration}
-              current={current}
-              volume={volume}
-              onTogglePlay={togglePlay}
-              onSeek={handleSeek}
-              onToggleMute={toggleMute}
-              onVolume={handleVolume}
-              onToggleFS={toggleFullscreen}
-              fmt={fmt}
-              inset
-              showVolume={showVolume}
-            />
+            {(!isFS || overlayFS) && (
+              <Controls
+                isPlaying={isPlaying}
+                muted={muted}
+                isFS={isFS}
+                duration={duration}
+                current={current}
+                volume={volume}
+                onTogglePlay={togglePlay}
+                onSeek={handleSeek}
+                onToggleMute={toggleMute}
+                onVolume={handleVolume}
+                onToggleFS={toggleFullscreen}
+                fmt={fmt}
+                showVolume={hasFinePointer && !isIOS}
+              />
+            )}
           </motion.div>
         </div>
       )}
@@ -462,7 +577,7 @@ function Controls(props: {
               ) : (
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M5 10v4h4l5 5V5l-5 5H5z" />
-                  <path d="M16 7a5 5 0 010 10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                  <path d="M16 7a5 5 0 0 1 0 10" stroke="currentColor" strokeWidth="1.5" fill="none" />
                 </svg>
               )}
               <span className="text-[1.4rem] hidden sm:inline">{muted ? "Silencio" : "Sonido"}</span>
