@@ -98,7 +98,7 @@ export function SavoyeHomeHeroExact() {
   const [current, setCurrent] = useState(0);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
-  const [isFS, setIsFS] = useState(false);          // estado general de “pantalla completa”
+  const [isFS, setIsFS] = useState(false);           // estado general de “pantalla completa”
   const [overlayFS, setOverlayFS] = useState(false); // fullscreen CSS (iOS/mobile)
   const userPausedRef = useRef(false);
 
@@ -108,7 +108,10 @@ export function SavoyeHomeHeroExact() {
     if (!v) return;
     const onLoaded = () => setDuration(v.duration || 0);
     const onTime = () => setCurrent(v.currentTime || 0);
-    const onPlay = () => { setIsPlaying(true); userPausedRef.current = false; };
+    const onPlay = () => {
+      setIsPlaying(true);
+      userPausedRef.current = false;
+    };
     const onPause = () => setIsPlaying(false);
     v.addEventListener("loadedmetadata", onLoaded);
     v.addEventListener("timeupdate", onTime);
@@ -134,7 +137,7 @@ export function SavoyeHomeHeroExact() {
         if (!e) return;
         const visible = e.isIntersecting && e.intersectionRatio >= 0.55;
         if (visible) {
-          if (!userPausedRef.current) v.play().catch(() => {});
+          if (!userPausedRef.current) v.play().catch((err) => { void err; });
         } else {
           v.pause();
         }
@@ -150,41 +153,53 @@ export function SavoyeHomeHeroExact() {
     const onFsChange = () => {
       const fsEl =
         document.fullscreenElement ||
-        // @ts-ignore webkit
-        document.webkitFullscreenElement ||
+        (document as any).webkitFullscreenElement ||
         null;
       setIsFS(!!fsEl || overlayFS);
     };
     document.addEventListener("fullscreenchange", onFsChange);
-    // @ts-ignore
-    document.addEventListener("webkitfullscreenchange", onFsChange);
+    (document as any).addEventListener?.("webkitfullscreenchange", onFsChange);
     return () => {
       document.removeEventListener("fullscreenchange", onFsChange);
-      // @ts-ignore
-      document.removeEventListener("webkitfullscreenchange", onFsChange);
+      (document as any).removeEventListener?.("webkitfullscreenchange", onFsChange);
     };
   }, [overlayFS]);
 
   // Acciones
   const togglePlay = () => {
-    const v = videoRef.current; if (!v) return;
-    if (v.paused) { userPausedRef.current = false; v.play().catch(() => {}); }
-    else { userPausedRef.current = true; v.pause(); }
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      userPausedRef.current = false;
+      v.play().catch((err) => { void err; });
+    } else {
+      userPausedRef.current = true;
+      v.pause();
+    }
   };
   const handleSeek = (val: number) => {
-    const v = videoRef.current; if (!v) return;
+    const v = videoRef.current;
+    if (!v) return;
     const t = Math.min(Math.max(val, 0), duration || 0);
-    v.currentTime = t; setCurrent(t);
+    v.currentTime = t;
+    setCurrent(t);
   };
   const handleVolume = (val: number) => {
-    const v = videoRef.current; if (!v) return;
+    const v = videoRef.current;
+    if (!v) return;
     const vol = Math.min(Math.max(val, 0), 1);
-    v.volume = vol; setVolume(vol);
-    if (vol > 0 && muted) { v.muted = false; setMuted(false); }
+    v.volume = vol;
+    setVolume(vol);
+    if (vol > 0 && muted) {
+      v.muted = false;
+      setMuted(false);
+    }
   };
   const toggleMute = () => {
-    const v = videoRef.current; if (!v) return;
-    v.muted = !v.muted; setMuted(v.muted);
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
   };
 
   const toggleFullscreen = () => {
@@ -194,13 +209,21 @@ export function SavoyeHomeHeroExact() {
       setIsFS((p) => !p);
       return;
     }
-    const c = containerRef.current || videoRef.current; if (!c) return;
-    // @ts-ignore
-    const req = c.requestFullscreen || c.webkitRequestFullscreen;
-    // @ts-ignore
-    const exit = document.exitFullscreen || document.webkitExitFullscreen;
-    if (!document.fullscreenElement) req?.call(c);
-    else exit?.call(document);
+    const c = containerRef.current || videoRef.current;
+    if (!c) return;
+    const req: undefined | (() => Promise<void>) =
+      (c as any).requestFullscreen || (c as any).webkitRequestFullscreen;
+    const exit: undefined | (() => Promise<void>) =
+      (document as any).exitFullscreen || (document as any).webkitExitFullscreen;
+
+    const isDocFS =
+      document.fullscreenElement || (document as any).webkitFullscreenElement;
+
+    if (!isDocFS) {
+      req?.call(c);
+    } else {
+      exit?.call(document);
+    }
   };
 
   // Ajustar medidas al rotar mientras está el overlay activo
@@ -223,7 +246,8 @@ export function SavoyeHomeHeroExact() {
 
   const fmt = (s: number) => {
     if (!isFinite(s)) return "0:00";
-    const m = Math.floor(s / 60), ss = Math.floor(s % 60);
+    const m = Math.floor(s / 60),
+      ss = Math.floor(s % 60);
     return `${m}:${ss.toString().padStart(2, "0")}`;
   };
 
@@ -231,10 +255,7 @@ export function SavoyeHomeHeroExact() {
   const showVolume = hasFinePointer && !isIOS; // oculta en móviles (especialmente iOS)
 
   // Clases estilo overlay fullscreen para móvil/iOS
-  const overlayClass =
-    overlayFS
-      ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0"
-      : "";
+  const overlayClass = overlayFS ? "fixed inset-0 z-[60] bg-black w-[100svw] h-[100svh] m-0" : "";
 
   return (
     <header
