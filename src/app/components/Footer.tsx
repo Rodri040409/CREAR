@@ -170,7 +170,7 @@ export default function SavoyeContactFooterExact() {
               </div>
 
               <p className="mt-[1.6rem] max-w-[34rem] text-[1.5rem] leading-[1.9] text-[#6f6f6f] [font-family:'Roboto',_system-ui]">
-                Bienvenido a <span className="text-[#272727]">Crear</span>, empresa de arquitectura.
+                Bienvenido a <span className="text-[#272727]">Crear</span>, estudio de arquitectura.
               </p>
             </div>
 

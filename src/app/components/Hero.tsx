@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -86,7 +87,6 @@ export default function SavoyeTopExact() {
     href: `/servicios/${slug}`,
   });
 
-  // Ahora cada item incluye href
   const services: ServiceItem[] = [
     svc("diseno-arquitectonico", "/imagenes/Iconos/icono1.png", "Diseño Arquitectónico"),
     svc("construccion", "/imagenes/Iconos/icono2.png", "Construcción"),
@@ -194,35 +194,73 @@ export default function SavoyeTopExact() {
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ pointerEvents: active ? "auto" : "none" }}
             >
-              <motion.div initial={false} animate={{ scale: active ? 1.04 : 1.02 }} transition={{ duration: 7, ease: [0.4, 0.0, 0.2, 1] }} className="absolute inset-0 z-0">
+              <motion.div
+                initial={false}
+                animate={{ scale: active ? 1.04 : 1.02 }}
+                transition={{ duration: 7, ease: [0.4, 0.0, 0.2, 1] }}
+                className="absolute inset-0 z-0"
+              >
                 <picture className="absolute inset-0 block">
                   <source media="(min-width: 1024px)" srcSet={s.desktop.src} />
                   <source media="(min-width: 768px)" srcSet={s.tablet.src} />
-                  <img src={s.mobile.src} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "var(--obj-pos, center center)" }} />
+                  <img
+                    src={s.mobile.src}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ objectPosition: "var(--obj-pos, center center)" }}
+                  />
                 </picture>
               </motion.div>
 
               <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,.75)_0%,rgba(0,0,0,.55)_45%,rgba(0,0,0,.35)_72%,rgba(0,0,0,.12)_100%)]" />
 
+              {/* ======== MÓVIL: logo centrado + LEYENDA debajo + CTA ======== */}
               {isFirst && (
-                <div className="relative z-20 flex h-full items-center justify-center md:hidden">
-                  <motion.div initial={{ opacity: 0, scale: 0.9, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }} className="relative">
+                <div className="relative z-20 flex h-full flex-col items-center justify-center md:hidden">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 12 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
+                    className="relative"
+                  >
                     <span className="absolute inset-0 -z-[1] rounded-[1rem] bg-white/95 shadow-[0_2rem_5rem_rgba(0,0,0,.25)] ring-1 ring-black/10" />
-                    <motion.img src={logoLight} alt="CREAR" className="block w-[70vw] max-w-[360px] h-auto p-6" draggable={false} animate={{ scale: [1, 1.02, 1], y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
+                    <motion.img
+                      src={logoLight}
+                      alt="CREAR"
+                      className="block w-[70vw] max-w-[360px] h-auto p-6"
+                      draggable={false}
+                      animate={{ scale: [1, 1.02, 1], y: [0, -6, 0] }}
+                      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    />
                   </motion.div>
 
+                  {/* LEYENDA SOLICITADA */}
+                  <p
+                    className="mt-4 max-w-[85vw] text-center text-[1.4rem] leading-[1.35] text-white
+                               [text-shadow:0_1px_0_rgba(0,0,0,.35)]"
+                  >
+                    ¿Tienes un proyecto en mente?
+                    <br />
+                    Construyamos algo increíble juntos
+                  </p>
+
+                  {/* CTA bajo el logo (móvil) */}
                   <a
                     href={s.cta}
                     target="_blank"
                     rel="noopener"
                     className="absolute left-1/2 -translate-x-1/2 rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white shadow-[0_10px_30px_rgba(0,0,0,.28)]"
-                    style={{ backgroundColor: ACCENT, bottom: "max(96px, calc(env(safe-area-inset-bottom, 0px) + 124px))" }}
+                    style={{
+                      backgroundColor: ACCENT,
+                      bottom: "max(96px, calc(env(safe-area-inset-bottom, 0px) + 124px))",
+                    }}
                   >
                     WhatsApp
                   </a>
                 </div>
               )}
 
+              {/* ======== Tablet/desktop o slides ≠ 0: texto normal ======== */}
               <div className={`relative z-20 h-full items-center ${isFirst ? "hidden md:flex" : "flex"}`}>
                 <div className="mx-auto w-full max-w-[114rem] px-[1.5rem]">
                   <div className="max-w-[76rem]">
@@ -233,14 +271,23 @@ export default function SavoyeTopExact() {
                     <h1 className="[font-family:'Khand',_sans-serif] text-white uppercase leading-[1.05] tracking-[.01em] text-[clamp(3.2rem,9vw,10rem)] font-[700] [text-shadow:0_2px_0_rgba(0,0,0,.25)]">
                       {s.title}
                     </h1>
-                    <p className="mt-[1.2rem] max-w-[64rem] text-[1.4rem] leading-[1.72] text-[rgba(255,255,255,.86)]">{s.copy}</p>
-                    <a href={s.cta} target="_blank" rel="noopener" className="mt-[2rem] inline-block rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white" style={{ backgroundColor: ACCENT }}>
+                    <p className="mt-[1.2rem] max-w-[64rem] text-[1.4rem] leading-[1.72] text-[rgba(255,255,255,.86)]">
+                      {s.copy}
+                    </p>
+                    <a
+                      href={s.cta}
+                      target="_blank"
+                      rel="noopener"
+                      className="mt-[2rem] inline-block rounded-[.2rem] px-[1.8rem] py-[1.2rem] text-[1.2rem] font-bold uppercase tracking-[.18em] text-white"
+                      style={{ backgroundColor: ACCENT }}
+                    >
                       WhatsApp
                     </a>
                   </div>
                 </div>
               </div>
 
+              {/* object-position por breakpoint */}
               <script
                 dangerouslySetInnerHTML={{
                   __html: `
@@ -275,23 +322,44 @@ export default function SavoyeTopExact() {
 
         {/* Flechas móviles */}
         <div className="absolute inset-y-0 left-0 right-0 z-50 flex items-center justify-between px-3 lg:hidden pointer-events-none">
-          <button onClick={prev} aria-label="Anterior" className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm">
+          <button
+            onClick={prev}
+            aria-label="Anterior"
+            className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+          >
             ‹
           </button>
-          <button onClick={next} aria-label="Siguiente" className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm">
+          <button
+            onClick={next}
+            aria-label="Siguiente"
+            className="pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+          >
             ›
           </button>
         </div>
 
-        {/* Mensaje móvil */}
-        <div className="absolute left-1/2 z-50 -translate-x-1/2 lg:hidden text-center" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}>
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }} className="inline-flex max-w-[92vw] items-center justify-center rounded-[.6rem] px-3 py-2 bg-black/55 backdrop-blur-[2px] ring-1 ring-white/10 shadow-[0_8px_24px_rgba(0,0,0,.35)]">
-            <p className="text-[1.3rem] leading-tight text-white [text-shadow:0_1px_0_rgba(0,0,0,.35)]">Explora nuestros servicios: toca los recuadros inferiores</p>
+        {/* Mensaje móvil (inferior) */}
+        <div
+          className="absolute left-1/2 z-50 -translate-x-1/2 lg:hidden text-center"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
+            className="inline-flex max-w-[92vw] items-center justify-center rounded-[.6rem] px-3 py-2 bg-black/55 backdrop-blur-[2px] ring-1 ring-white/10 shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+          >
+            <p className="text-[1.3rem] leading-tight text-white [text-shadow:0_1px_0_rgba(0,0,0,.35)]">
+              Explora nuestros servicios: toca los recuadros inferiores
+            </p>
           </motion.div>
         </div>
 
         {/* Bullets móvil */}
-        <div className="absolute left-1/2 z-50 flex -translate-x-1/2 gap-3 lg:hidden" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
+        <div
+          className="absolute left-1/2 z-50 flex -translate-x-1/2 gap-3 lg:hidden"
+          style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}
+        >
           {slides.map((_, i) => {
             const active = i === idx;
             return (
