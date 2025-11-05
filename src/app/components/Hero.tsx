@@ -86,12 +86,12 @@ export default function SavoyeTopExact() {
   ];
 
   const services = [
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/6-2.png", label: "Diseño Arquitectónico", href: "/servicios/diseno-arquitectonico" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/2-2.png", label: "Construcción", href: "/servicios/construccion" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/4-2.png", label: "Obra pública", href: "/servicios/obra-publica" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/3-2.png", label: "Urbanización", href: "/servicios/urbanizacion" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/5-2.png", label: "Electrificación", href: "/servicios/electrificacion" },
-    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/1-2.png", label: "Gestión de proyectos", href: "/servicios/gestion-de-proyectos" },
+    { icon: "/imagenes/Iconos/icono1.png", label: "Diseño Arquitectónico", href: "/servicios/diseno-arquitectonico" },
+    { icon: "/imagenes/Iconos/icono2.png", label: "Construcción", href: "/servicios/construccion" },
+    { icon: "/imagenes/Iconos/icono3.png", label: "Obra pública", href: "/servicios/obra-publica" },
+    { icon: "/imagenes/Iconos/icono4.png", label: "Urbanización", href: "/servicios/urbanizacion" },
+    { icon: "/imagenes/Iconos/icono5.png", label: "Electrificación", href: "/servicios/electrificacion" },
+    { icon: "/imagenes/Iconos/icono6.png", label: "Gestión de proyectos", href: "/servicios/gestion-de-proyectos" },
   ];
 
   const [idx, setIdx] = useState(0);

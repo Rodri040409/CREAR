@@ -9,11 +9,6 @@
     "imagenes\\Hero\\Hero1.webp",
     "imagenes\\Hero\\Hero1.avif"
   ],
-  "Hero\\Hero1_mobile.jpg": [
-    "imagenes\\Hero\\Hero1_mobile.jpg",
-    "imagenes\\Hero\\Hero1_mobile.webp",
-    "imagenes\\Hero\\Hero1_mobile.avif"
-  ],
   "Hero\\Hero2.jpg": [
     "imagenes\\Hero\\Hero2.jpg",
     "imagenes\\Hero\\Hero2.webp",
@@ -28,6 +23,36 @@
     "imagenes\\Hero\\Hero4.jpg",
     "imagenes\\Hero\\Hero4.webp",
     "imagenes\\Hero\\Hero4.avif"
+  ],
+  "Iconos\\icono1.png": [
+    "imagenes\\Iconos\\icono1.png",
+    "imagenes\\Iconos\\icono1.webp",
+    "imagenes\\Iconos\\icono1.avif"
+  ],
+  "Iconos\\icono2.png": [
+    "imagenes\\Iconos\\icono2.png",
+    "imagenes\\Iconos\\icono2.webp",
+    "imagenes\\Iconos\\icono2.avif"
+  ],
+  "Iconos\\icono3.png": [
+    "imagenes\\Iconos\\icono3.png",
+    "imagenes\\Iconos\\icono3.webp",
+    "imagenes\\Iconos\\icono3.avif"
+  ],
+  "Iconos\\icono4.png": [
+    "imagenes\\Iconos\\icono4.png",
+    "imagenes\\Iconos\\icono4.webp",
+    "imagenes\\Iconos\\icono4.avif"
+  ],
+  "Iconos\\icono5.png": [
+    "imagenes\\Iconos\\icono5.png",
+    "imagenes\\Iconos\\icono5.webp",
+    "imagenes\\Iconos\\icono5.avif"
+  ],
+  "Iconos\\icono6.png": [
+    "imagenes\\Iconos\\icono6.png",
+    "imagenes\\Iconos\\icono6.webp",
+    "imagenes\\Iconos\\icono6.avif"
   ],
   "Nosotros\\Nosotros.png": [
     "imagenes\\Nosotros\\Nosotros.png",
