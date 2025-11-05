@@ -1,14 +1,45 @@
 "use client";
 
-/** CREAR — CONTACTO + FOOTER (compacto en móvil y con icono WA AVIF/WebP/PNG) */
+import { useEffect, useMemo, useState } from "react";
+
+/** CREAR — CONTACTO + FOOTER (compacto en móvil y con icono WA AVIF/WebP/PNG)
+ *  + Indicador de scroll (anillo de progreso alrededor del botón "Volver arriba")
+ */
 export default function SavoyeContactFooterExact() {
   const year = new Date().getFullYear();
 
-  // Base del icono (sin extensión). Debes tener:
-  // /imagenes/Redes/whatsapp.avif, .webp y .png (o .jpg)
+  // WhatsApp
   const WA_BASE = "/imagenes/Redes/whatsapp";
   const WA =
     "https://wa.me/522961205199?text=Hola%20CREAR%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20sus%20servicios";
+
+  // === Indicador de scroll ===
+  const ACCENT = "#c5a47e";
+  const [progress, setProgress] = useState(0); // 0..1
+
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || window.pageYOffset || 0;
+      const max = Math.max(1, doc.scrollHeight - doc.clientHeight);
+      setProgress(top / max);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+  const ringBg = useMemo(
+    () =>
+      // anillo con conic-gradient; el tramo restante queda en un color suave
+      `conic-gradient(${ACCENT} ${pct * 3.6}deg, rgba(197,164,126,.22) 0deg)`,
+    [pct]
+  );
 
   return (
     <footer className="bg-white antialiased">
@@ -91,7 +122,7 @@ export default function SavoyeContactFooterExact() {
               </p>
             </div>
 
-            {/* WHATSAPP (reemplaza ubicación) */}
+            {/* WHATSAPP */}
             <div className="col-span-12 md:col-span-4">
               <a
                 href={WA}
@@ -101,7 +132,6 @@ export default function SavoyeContactFooterExact() {
                 aria-label="Abrir WhatsApp"
                 title="Escríbenos por WhatsApp"
               >
-                {/* Burbuja con <picture> AVIF → WebP → PNG/JPG */}
                 <span className="relative grid h-[6.8rem] w-[6.8rem] place-items-center rounded-full bg-white shadow-[0_10px_25px_rgba(0,0,0,.08)] ring-1 ring-black/5 transition-transform duration-200 group-hover:scale-105 md:h-[8.5rem] md:w-[8.5rem]">
                   <picture>
                     <source srcSet={`${WA_BASE}.avif`} type="image/avif" />
@@ -124,7 +154,6 @@ export default function SavoyeContactFooterExact() {
       </section>
 
       {/* ============================ FOOTER WIDGETS ============================ */}
-      {/* Top en móvil también más corto para que no se sienta hueco */}
       <section className="relative">
         <div className="mx-auto w-full max-w-[114rem] px-[1.5rem] pt-[4.4rem] pb-[6.4rem] md:pt-[8rem] md:pb-[8rem]">
           <div className="grid grid-cols-12 gap-x-[3rem]">
@@ -201,17 +230,31 @@ export default function SavoyeContactFooterExact() {
           {/* (sin términos/privacidad) */}
         </div>
 
-        {/* Volver arriba */}
-        <a
-          href="#home"
-          aria-label="Volver arriba"
-          className="fixed bottom-[2rem] right-[2rem] z-50 grid h-[4.2rem] w-[4.2rem] place-items-center rounded-full border border-[#d9c5ab] text-[#c5a47e] bg-white shadow-[0_6px_18px_rgba(0,0,0,.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,.12)] transition"
-          title="Volver arriba"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 5l-7 7m7-7l7 7M12 5v14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
-        </a>
+        {/* Volver arriba + anillo de progreso */}
+        <div className="fixed bottom-[2rem] right-[2rem] z-50">
+          {/* contenedor que pinta el anillo; el padding crea el “bisel” */}
+          <div
+            className="rounded-full p-[.32rem]"
+            style={{
+              background: ringBg,
+              boxShadow: "0 6px 18px rgba(0,0,0,.08)",
+            }}
+            aria-hidden
+          >
+            <a
+              href="#home"
+              aria-label={`Volver arriba — ${pct}% de avance`}
+              title={`Has recorrido ${pct}%`}
+              className="grid h-[4.2rem] w-[4.2rem] place-items-center rounded-full border border-[#d9c5ab] text-[#c5a47e] bg-white
+                         shadow-[0_6px_18px_rgba(0,0,0,.08)] hover:shadow-[0_8px_24px_rgba(0,0,0,.12)] transition"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 5l-7 7m7-7l7 7M12 5v14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <span className="sr-only">{pct}%</span>
+            </a>
+          </div>
+        </div>
       </section>
     </footer>
   );

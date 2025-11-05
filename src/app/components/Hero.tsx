@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import ServicesRibbon from "./ServicesRibbon";
 
 type BreakImg = { src: string; pos?: string };
 type Slide = {
@@ -85,36 +86,12 @@ export default function SavoyeTopExact() {
   ];
 
   const services = [
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/6-2.png",
-      label: "Diseño Arquitectónico",
-      href: "/servicios/diseno-arquitectonico",
-    },
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/2-2.png",
-      label: "Construcción",
-      href: "/servicios/construccion",
-    },
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/4-2.png",
-      label: "Obra pública",
-      href: "/servicios/obra-publica",
-    },
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/3-2.png",
-      label: "Urbanización",
-      href: "/servicios/urbanizacion",
-    },
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/5-2.png",
-      label: "Electrificación",
-      href: "/servicios/electrificacion",
-    },
-    {
-      icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/1-2.png",
-      label: "Gestión de proyectos",
-      href: "/servicios/gestion-de-proyectos",
-    },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/6-2.png", label: "Diseño Arquitectónico", href: "/servicios/diseno-arquitectonico" },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/2-2.png", label: "Construcción", href: "/servicios/construccion" },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/4-2.png", label: "Obra pública", href: "/servicios/obra-publica" },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/3-2.png", label: "Urbanización", href: "/servicios/urbanizacion" },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/5-2.png", label: "Electrificación", href: "/servicios/electrificacion" },
+    { icon: "https://shtheme.org/demosd/savoye/wp-content/uploads/2022/01/1-2.png", label: "Gestión de proyectos", href: "/servicios/gestion-de-proyectos" },
   ];
 
   const [idx, setIdx] = useState(0);
@@ -299,10 +276,7 @@ export default function SavoyeTopExact() {
                 <div className="mx-auto w-full max-w-[114rem] px-[1.5rem]">
                   <div className="max-w-[76rem]">
                     <div className="mb-[1.2rem] inline-flex items-center gap-[1.4rem] text-[1.2rem] uppercase tracking-[.32em] text-white">
-                      <span
-                        className="inline-block h-[.2rem] w-[3.8rem]"
-                        style={{ backgroundColor: ACCENT }}
-                      />
+                      <span className="inline-block h-[.2rem] w-[3.8rem]" style={{ backgroundColor: ACCENT }} />
                       {s.kicker}
                     </div>
                     <h1 className="[font-family:'Khand',_sans-serif] text-white uppercase leading-[1.05] tracking-[.01em] text-[clamp(3.2rem,9vw,10rem)] font-[700] [text-shadow:0_2px_0_rgba(0,0,0,.25)]">
@@ -384,14 +358,9 @@ export default function SavoyeTopExact() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
-            className="inline-flex max-w-[92vw] items-center justify-center
-                      rounded-[.6rem] px-3 py-2
-                      bg-black/55 backdrop-blur-[2px]
-                      ring-1 ring-white/10
-                      shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+            className="inline-flex max-w-[92vw] items-center justify-center rounded-[.6rem] px-3 py-2 bg-black/55 backdrop-blur-[2px] ring-1 ring-white/10 shadow-[0_8px_24px_rgba(0,0,0,.35)]"
           >
-            <p className="text-[1.3rem] leading-tight text-white
-                          [text-shadow:0_1px_0_rgba(0,0,0,.35)]">
+            <p className="text-[1.3rem] leading-tight text-white [text-shadow:0_1px_0_rgba(0,0,0,.35)]">
               Explora nuestros servicios: toca los recuadros inferiores
             </p>
           </motion.div>
@@ -408,9 +377,7 @@ export default function SavoyeTopExact() {
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className={`h-2.5 w-2.5 rounded-full transition ${
-                  active ? "bg-white" : "border border-white/80 bg-transparent"
-                }`}
+                className={`h-2.5 w-2.5 rounded-full transition ${active ? "bg-white" : "border border-white/80 bg-transparent"}`}
                 aria-label={`Ir al slide ${i + 1}`}
               />
             );
@@ -425,83 +392,18 @@ export default function SavoyeTopExact() {
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className={`grid h-[2.8rem] w-[2.8rem] place-items-center rounded-full border-2 ${
-                  active ? "border-white" : "border-white/65"
-                } transition-transform duration-200 hover:scale-[1.05] ring-1 ring-white/15`}
+                className={`grid h-[2.8rem] w-[2.8rem] place-items-center rounded-full border-2 ${active ? "border-white" : "border-white/65"} transition-transform duration-200 hover:scale-[1.05] ring-1 ring-white/15`}
                 aria-label={`Ir al slide ${i + 1}`}
               >
-                <span
-                  className={`h-[1rem] w-[1rem] rounded-full ${
-                    active ? "bg-white" : "bg-transparent"
-                  }`}
-                />
+                <span className={`h-[1rem] w-[1rem] rounded-full ${active ? "bg-white" : "bg-transparent"}`} />
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* RIBBON (igual) */}
-      <div className="relative z-30 md:-mt-[17.7rem]">
-        <div className="w-full shadow-[0_2.8rem_7rem_rgba(0,0,0,.22)]">
-          <div
-            className="grid grid-cols-1 md:grid-cols-4 border-b"
-            style={{ borderColor: BORDER }}
-          >
-            <div className="hidden md:block h-[17.6rem] bg-transparent" />
-            <div className="hidden md:flex h-[17.6rem] items-center justify-center bg-white">
-              <p className="px-6 text-center text-[1.6rem] leading-snug text-[#6f6f6f]">
-                Explora nuestros servicios: utiliza los recuadros
-              </p>
-            </div>
-
-            <Link
-              href={services[0].href}
-              title={services[0].label}
-              className="group flex h-[14rem] md:h-[17.6rem] flex-col items-center justify-center gap-[1.6rem] bg-white transition-colors hover:bg-[#F3ECE5] md:border-r"
-              style={{ borderColor: BORDER }}
-            >
-              <img src={services[0].icon} alt="" className="h-[5.6rem] w-[5.6rem] object-contain" />
-              <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
-                {services[0].label}
-              </span>
-            </Link>
-
-            <Link
-              href={services[1].href}
-              title={services[1].label}
-              className="group flex h-[14rem] md:h-[17.6rem] flex-col items-center justify-center gap-[1.6rem] bg-white transition-colors hover:bg-[#F3ECE5]"
-            >
-              <img src={services[1].icon} alt="" className="h-[5.6rem] w-[5.6rem] object-contain" />
-              <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
-                {services[1].label}
-              </span>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4">
-            {services.slice(2).map((svc, i, arr) => (
-              <Link
-                key={svc.label}
-                href={svc.href}
-                title={svc.label}
-                className="group flex h-[14rem] md:h-[17.6rem] flex-col items-center justify-center gap-[1.6rem] bg-white transition-colors hover:bg-[#F3ECE5] border-t"
-                style={{
-                  borderColor: BORDER,
-                  borderRight: i !== arr.length - 1 ? `1px solid ${BORDER}` : undefined,
-                }}
-              >
-                <img src={svc.icon} alt="" className="h-[5.6rem] w-[5.6rem] object-contain" />
-                <span className="[font-family:'Khand',_sans-serif] text-[1.9rem] tracking-[.01em] leading-[1.2] text-[#6f6f6f] group-hover:text-[#111] select-text">
-                  {svc.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="h-[10rem]" />
-      </div>
+      {/* RIBBON (usa el componente) */}
+      <ServicesRibbon services={services} ACCENT={ACCENT} BORDER={BORDER} />
     </section>
   );
 }

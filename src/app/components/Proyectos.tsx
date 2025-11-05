@@ -11,10 +11,7 @@ const ACCENT = "#c5a47e";
 // Patrón de columnas para DESKTOP
 const PATTERN_DESKTOP: ("L" | "R")[] = ["L", "R", "R", "L", "R", "L"];
 
-/** Orden explícito por dispositivo (usa slugs). 
- *  - Los slugs listados se colocan en ese orden.
- *  - Los que no aparezcan se agregan al final respetando el orden original.
- */
+/** Orden explícito por dispositivo (usa slugs). */
 const ORDER = {
   desktop: [
     "casa-21",
@@ -36,7 +33,7 @@ const ORDER = {
   ],
 };
 
-/* ------------ Helpers para imágenes con fallback (AVIF → WebP → JPG) ------------ */
+/* ------------ Helpers imágenes AVIF → WebP → JPG ------------ */
 function buildFormats(originalPath: string) {
   const base = originalPath.replace(/\.(avif|webp|jpe?g|png)$/i, "");
   return { avif: `${base}.avif`, webp: `${base}.webp`, fallback: originalPath };
@@ -81,18 +78,16 @@ function useIsDesktop() {
   return isDesktop;
 }
 
-// Aplica un orden parcial/total basado en slugs
-function applyOrder(items: ProjectItem[], orderList: string[] | undefined) {
+function applyOrder(items: ProjectItem[], orderList?: string[]) {
   if (!orderList || orderList.length === 0) return items;
   const pos = new Map(orderList.map((slug, i) => [slug, i]));
-  const BIG = 1e9; // envía al final lo no listado
-  return items.slice().sort(
-    (a, b) => (pos.get(a.slug) ?? BIG) - (pos.get(b.slug) ?? BIG)
-  );
+  const BIG = 1e9;
+  return items
+    .slice()
+    .sort((a, b) => (pos.get(a.slug) ?? BIG) - (pos.get(b.slug) ?? BIG));
 }
 
-// Divide en columnas siguiendo el patrón (solo desktop)
-function splitByPattern(items: ProjectItem[], pattern: ("L"|"R")[]) {
+function splitByPattern(items: ProjectItem[], pattern: ("L" | "R")[]) {
   const left: ProjectItem[] = [];
   const right: ProjectItem[] = [];
   items.forEach((p, idx) => {
@@ -104,20 +99,18 @@ function splitByPattern(items: ProjectItem[], pattern: ("L"|"R")[]) {
 export default function Proyectos() {
   const isDesktop = useIsDesktop();
 
-  // 1) Decide orden según dispositivo
   const ordered = useMemo(() => {
-    if (isDesktop === null) return PROJECTS; // SSR: neutro
+    if (isDesktop === null) return PROJECTS;
     return applyOrder(PROJECTS, isDesktop ? ORDER.desktop : ORDER.mobile);
   }, [isDesktop]);
 
-  // 2) Solo si es desktop, repartimos en columnas
   const columns = useMemo(() => {
     if (!isDesktop) return { left: [] as ProjectItem[], right: [] as ProjectItem[] };
     return splitByPattern(ordered, PATTERN_DESKTOP);
   }, [ordered, isDesktop]);
 
   return (
-    <section id="projects" className="bg-white antialiased">
+    <section id="projects" data-section="projects" className="bg-white antialiased">
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;700&display=swap"
@@ -130,7 +123,7 @@ export default function Proyectos() {
           </h2>
         </div>
 
-        {/* MÓVIL: una sola columna en el orden exacto de `ordered` */}
+        {/* MÓVIL */}
         {isDesktop === false && (
           <div className="space-y-[6rem]">
             {ordered.map((p) => (
@@ -147,7 +140,7 @@ export default function Proyectos() {
           </div>
         )}
 
-        {/* DESKTOP: dos columnas L/R con tu patrón */}
+        {/* DESKTOP */}
         {isDesktop && (
           <div className="grid grid-cols-12 md:gap-x-[3rem]">
             <div className="col-span-6">
@@ -188,14 +181,46 @@ export default function Proyectos() {
 function Item({ p }: { p: ProjectItem }) {
   return (
     <div className="relative pl-[3rem] pb-[6rem] md:pl-[9rem] md:pb-[9rem]">
-      <Link href={`/proyectos/${p.slug}`} className="block overflow-hidden">
+      {/* LINK: imagen + overlays + CTA (arriba-izquierda) */}
+      <Link
+        href={`/proyectos/${p.slug}`}
+        aria-label={`Ver proyecto: ${p.title}`}
+        className="group relative block overflow-hidden cursor-pointer
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        style={{ outlineColor: ACCENT }}
+      >
+        {/* Imagen con micro-zoom */}
         <PictureFallback
           src={p.thumb}
           alt={p.title}
-          className="block w-full h-auto select-none object-cover transition-transform duration-300 hover:scale-95"
+          className="block w-full h-auto select-none object-cover
+                     transition-transform duration-300 group-hover:scale-[1.02]"
         />
+
+        {/* Fade inferior sutil para dar contraste al título */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-28
+                     bg-gradient-to-t from-black/18 via-black/8 to-transparent
+                     opacity-100 md:opacity-0 md:group-hover:opacity-100
+                     transition-opacity duration-300"
+        />
+
+        {/* CTA: ahora ARRIBA-IZQUIERDA para no chocar con la tarjeta */}
+        <span
+          className="absolute left-3 top-3 md:left-4 md:top-4
+                     rounded bg-white/95 px-[1.2rem] py-[.6rem]
+                     text-[1.2rem] font-semibold uppercase tracking-[.12em]
+                     text-[#272727] shadow
+                     opacity-100 md:opacity-0 md:group-hover:opacity-100
+                     transition"
+          style={{ color: ACCENT }}
+        >
+          Click aquí para ver más
+        </span>
       </Link>
 
+      {/* Tarjeta de texto (queda libre de solaparse con el CTA) */}
       <div
         className="
           absolute left-[3rem] bottom-[3rem]
@@ -209,8 +234,12 @@ function Item({ p }: { p: ProjectItem }) {
           {p.category}
         </p>
         <h3 className="text-[2.2rem] md:text-[2.4rem] leading-[1.25em] text-[#272727] m-0">
-          <Link href={`/proyectos/${p.slug}`} className="hover:opacity-80">
-            {p.title}
+          <Link
+            href={`/proyectos/${p.slug}`}
+            aria-label={`Ver proyecto: ${p.title}`}
+            className="hover:opacity-80"
+          >
+            {p.title} <span aria-hidden>→</span>
           </Link>
         </h3>
       </div>
